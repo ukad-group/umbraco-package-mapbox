@@ -18,7 +18,6 @@
         vm.setMarker = setMarker;
         vm.clearMarker = clearMarker;
         vm.setZoom = setZoom;
-        vm.clearZoom = clearZoom;
 
         vm.inputId = "osm_search_" + String.CreateGuid();
         vm.inputLatId = "osm_Lat_" + String.CreateGuid();
@@ -60,10 +59,6 @@
         vm.showZoom =
             $scope.model.config.showZoom != null
                 ? Object.toBoolean($scope.model.config.showZoom)
-                : false;
-        vm.allowClearZoom =
-            $scope.model.config.allowClearZoom != null
-                ? Object.toBoolean($scope.model.config.allowClearZoom)
                 : false;
 
         async function initMapboxMap() {
@@ -236,14 +231,6 @@
 
             vm.map.setZoom(vm.inputZoom);
             updateModel();
-        }
-
-        function clearZoom(e, skipUpdate) {
-            vm.map.setZoom(0);
-
-            if (!skipUpdate) {
-                updateModel();
-            }
         }
 
         function onMapClick(e) {

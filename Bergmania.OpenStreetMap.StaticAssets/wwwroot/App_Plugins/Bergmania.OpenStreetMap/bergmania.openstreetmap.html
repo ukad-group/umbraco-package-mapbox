@@ -62,17 +62,6 @@
             placeholder="Zoom"
             class="coords-zoom-input"
         />
-        <umb-button
-            class="coords-clear-zoom-btn"
-            ng-if="vm.allowClearZoom && vm.showZoom"
-            type="button"
-            label="Clear"
-            label-ley="general_clear"
-            button-style="outline"
-            disabled="model.value.zoom === 0"
-            action="vm.clearZoom()"
-        >
-        </umb-button>
     </div>
 
     <div ng-show="!vm.showLoader">

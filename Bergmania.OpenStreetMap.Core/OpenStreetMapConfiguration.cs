@@ -32,9 +32,5 @@ namespace Bergmania.OpenStreetMap.Core
         [DataMember(Name = "showZoom")]
         [ConfigurationField("showZoom", "Show Zoom", Constants.BooleanView, Description = "Show zoom level above map.")]
         public bool ShowZoom { get; set; } = false;
-
-        [DataMember(Name = "allowClearZoom")]
-        [ConfigurationField("allowClearZoom", "Allow Clear Zoom", Constants.BooleanView, Description = "Allow clearing previous zoom.")]
-        public bool AllowClearZoom { get; set; } = false;
     }
 }
