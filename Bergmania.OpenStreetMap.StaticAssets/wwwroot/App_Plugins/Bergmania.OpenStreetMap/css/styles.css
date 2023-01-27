@@ -18,3 +18,40 @@
     border-radius: 3px;
     display: none;
 }
+
+.map-controls {
+    display: grid;
+    align-items: center;
+    text-align: end;
+    justify-content: start;
+    gap: 10px 5px;
+    grid-template-areas:
+        "lnglb lngin btnc"
+        "latlb latin btnc"
+        "zoomlb zoomin btnz";
+}
+
+.coords-lng-label {
+    grid-area: lnglb;
+}
+.coords-lng-input {
+    grid-area: lngin;
+}
+.coords-lat-label {
+    grid-area: latlb;
+}
+.coords-lat-input {
+    grid-area: latin;
+}
+.coords-zoom-label {
+    grid-area: zoomlb;
+}
+.coords-clear-btn {
+    grid-area: btnc;
+}
+.coords-zoom-input {
+    grid-area: zoomin;
+}
+.coords-clear-zoom-btn {
+    grid-area: btnz;
+}

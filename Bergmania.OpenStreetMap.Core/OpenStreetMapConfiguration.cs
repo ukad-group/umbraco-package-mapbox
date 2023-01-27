@@ -17,10 +17,6 @@ namespace Bergmania.OpenStreetMap.Core
         [ConfigurationField("showSearch", "Show Search", Constants.BooleanView, Description = "Show search field above map.")]
         public bool ShowSearch { get; set; } = false;
 
-        [DataMember(Name = "showCoordinates")]
-        [ConfigurationField("showCoordinates", "Show Coordinates", Constants.BooleanView, Description = "Show marker coordinates below map.")]
-        public bool ShowCoordinates { get; set; } = false;
-
         [DataMember(Name = "showSetMarkerByCoordinates")]
         [ConfigurationField("showSetMarkerByCoordinates", "Show Set Marker By Coordinates", Constants.BooleanView, Description = "Set Marker By Coordinates field's above map.")]
         public bool ShowSetMarkerByCoordinates { get; set; } = false;
@@ -32,5 +28,13 @@ namespace Bergmania.OpenStreetMap.Core
         [DataMember(Name = "scrollWheelZoom")]
         [ConfigurationField("scrollWheelZoom", "Scroll wheel zoom", Constants.BooleanView, Description = "Enable scroll wheel zoom in property editor?")]
         public bool ScrollWheelZoom { get; set; } = true;
+
+        [DataMember(Name = "showZoom")]
+        [ConfigurationField("showZoom", "Show Zoom", Constants.BooleanView, Description = "Show zoom level above map.")]
+        public bool ShowZoom { get; set; } = false;
+
+        [DataMember(Name = "allowClearZoom")]
+        [ConfigurationField("allowClearZoom", "Allow Clear Zoom", Constants.BooleanView, Description = "Allow clearing previous zoom.")]
+        public bool AllowClearZoom { get; set; } = false;
     }
 }

@@ -1,5 +1,4 @@
 <div ng-controller="Bergmania.OpenStreetMap.Controller as vm">
-
     <div ng-if="vm.showSearch" class="osm-auto-search mb3">
         <umb-search-filter
             input-id="{{vm.inputId}}"
@@ -11,50 +10,79 @@
         </umb-search-filter>
     </div>
 
-    <div ng-if="vm.showSetMarkerByCoordinates" class="flex flex-row items-center mb3">
-        <div class="flex flex-row items-center align-center mr2">
-            <localize key="bergmania_longitude" class="ml3">Longitude</localize>:
-            <input
-                type="number"
-                ng-model="vm.inputLng"
-                id="{{vm.inputLngId}}"
-                ng-change="vm.setMarker()"
-                placeholder="Longitude"
-                class="ml2"
-            />
+    <div class="map-controls mb3">
+        <div ng-if="vm.showSetMarkerByCoordinates" class="coords-lng-label">
+            <localize key="bergmania_longitude" class="ml3">Longitude</localize
+            >:
         </div>
-        <div class="flex flex-row items-center mr3">
-            <localize key="bergmania_latitude">Latitude</localize>:
-            <input
-                type="number"
-                ng-model="vm.inputLat"
-                id="{{vm.inputLatId}}"
-                ng-change="vm.setMarker()"
-                placeholder="Latitude"
-                class="ml2"
-            />
-        </div>
+        <input
+            ng-if="vm.showSetMarkerByCoordinates"
+            type="number"
+            ng-model="vm.inputLng"
+            id="{{vm.inputLngId}}"
+            ng-change="vm.setMarker()"
+            placeholder="Longitude"
+            class="coords-lng-input"
+        />
+
         <umb-button
-            ng-if="vm.allowClear"
+            ng-if="vm.allowClear && vm.showSetMarkerByCoordinates"
             type="button"
             label="Clear"
             label-ley="general_clear"
             button-style="outline"
             disabled="!model.value.marker"
             action="vm.clearMarker()"
+            class="coords-clear-btn"
+        >
+        </umb-button>
+
+        <div ng-if="vm.showSetMarkerByCoordinates" class="coords-lat-label">
+            <localize key="bergmania_latitude">Latitude</localize>:
+        </div>
+        <input
+            ng-if="vm.showSetMarkerByCoordinates"
+            type="number"
+            ng-model="vm.inputLat"
+            id="{{vm.inputLatId}}"
+            ng-change="vm.setMarker()"
+            placeholder="Latitude"
+            class="coords-lat-input"
+        />
+
+        <div ng-if="vm.showZoom" class="coords-zoom-label">
+            <localize key="bergmania_zoom">Zoom</localize>:
+        </div>
+        <input
+            ng-if="vm.showZoom"
+            type="number"
+            ng-model="vm.inputZoom"
+            id="{{vm.inputZoomId}}"
+            ng-change="vm.setZoom()"
+            placeholder="Zoom"
+            class="coords-zoom-input"
+        />
+        <umb-button
+            class="coords-clear-zoom-btn"
+            ng-if="vm.allowClearZoom && vm.showZoom"
+            type="button"
+            label="Clear"
+            label-ley="general_clear"
+            button-style="outline"
+            disabled="model.value.zoom === 0"
+            action="vm.clearZoom()"
         >
         </umb-button>
     </div>
+
     <div ng-show="!vm.showLoader">
         <div data-map="true" class="map"></div>
         <pre data-coordinates="true" class="coordinates"></pre>
     </div>
 
     <div ng-show="vm.showLoader" class="map">
-        <umb-load-indicator>
-        </umb-load-indicator>
+        <umb-load-indicator> </umb-load-indicator>
     </div>
 
     <div ng-show="vm.error">{{ vm.error }}</div>
-    
 </div>
