@@ -34,17 +34,17 @@ bld/
 # Visual Studio 2015/2017 cache/options directory
 .vs/
 
-/Bergmania.OpenStreetMap.Testsite/App_Plugins/
-/Bergmania.OpenStreetMap.Testsite/umbraco/Logs
-/Bergmania.OpenStreetMap.Testsite/umbraco/Data/TEMP
-/Bergmania.OpenStreetMap.Testsite/umbraco/Data/packages
-/Bergmania.OpenStreetMap.Testsite/wwwroot/umbraco/
-/Bergmania.OpenStreetMap.Testsite/umbraco/PartialViewMacros/
-/Bergmania.OpenStreetMap.Testsite/umbraco/UmbracoBackOffice/
-/Bergmania.OpenStreetMap.Testsite/umbraco/UmbracoInstall/
-/Bergmania.OpenStreetMap.Testsite/umbraco/UmbracoWebsite/
-/Bergmania.OpenStreetMap.Testsite/umbraco/config/
-/Bergmania.OpenStreetMap.Testsite/Smidge/
-/Bergmania.OpenStreetMap.Testsite.V1*/umbraco/
-/Bergmania.OpenStreetMap.Testsite.V1*/appsettings-schema*.json
+/UkadGroup.UmbracoPackageMapbox.Testsite/App_Plugins/
+/UkadGroup.UmbracoPackageMapbox.Testsite/umbraco/Logs
+/UkadGroup.UmbracoPackageMapbox.Testsite/umbraco/Data/TEMP
+/UkadGroup.UmbracoPackageMapbox.Testsite/umbraco/Data/packages
+/UkadGroup.UmbracoPackageMapbox.Testsite/wwwroot/umbraco/
+/UkadGroup.UmbracoPackageMapbox.Testsite/umbraco/PartialViewMacros/
+/UkadGroup.UmbracoPackageMapbox.Testsite/umbraco/UmbracoBackOffice/
+/UkadGroup.UmbracoPackageMapbox.Testsite/umbraco/UmbracoInstall/
+/UkadGroup.UmbracoPackageMapbox.Testsite/umbraco/UmbracoWebsite/
+/UkadGroup.UmbracoPackageMapbox.Testsite/umbraco/config/
+/UkadGroup.UmbracoPackageMapbox.Testsite/Smidge/
+/UkadGroup.UmbracoPackageMapbox.Testsite.V1*/appsettings-schema*.json
+/UkadGroup.UmbracoPackageMapbox.Testsite.V1*/umbraco/
 

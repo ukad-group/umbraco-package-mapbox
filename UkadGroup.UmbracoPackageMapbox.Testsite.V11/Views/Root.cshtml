@@ -1,0 +1,13 @@
+﻿@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.Root>
+@using ContentModels = Umbraco.Cms.Web.Common.PublishedModels;
+@using UkadGroup.UmbracoPackageMapbox.Core.Extensions;
+@{
+    Layout = "_Layout.cshtml";
+}
+
+<h2>Test map</h2>
+<p>@Model.TestMap.MapboxRendering()</p>
+<p><b>Zoom:</b> @Model.TestMap?.Zoom</p>
+<p><b>Marker:</b> @Model.TestMap?.Marker?.Latitude, @Model.TestMap?.Marker?.Longitude</p>
+<p><b>Bounding box:</b> @Model.TestMap?.BoundingBox.SouthWestCorner.Longitude, @Model.TestMap?.BoundingBox.SouthWestCorner.Latitude, @Model.TestMap?.BoundingBox.NorthEastCorner.Longitude, @Model.TestMap?.BoundingBox.NorthEastCorner.Latitude</p>
+@Html.MapboxScripts()
