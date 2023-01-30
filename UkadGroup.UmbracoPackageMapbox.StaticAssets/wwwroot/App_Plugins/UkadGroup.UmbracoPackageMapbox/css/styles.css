@@ -30,6 +30,56 @@
         "zoomlb zoomin . . .";
 }
 
+.image-picker {
+    display: flex;
+    height: 144px;
+    width: 144px;
+    padding: 20px 20px 20px;
+    background-color: #fff;
+    border: 4px dashed #d8d7d9;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+}
+
+.image-actions {
+    width: 192px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.raster-layer-map-container{
+    display: flex;
+    flex-direction: row;
+    column-gap: 50px;
+    justify-content: start;
+    align-items: center;
+}
+
+.raster-layer-map-controls {
+    display: grid;
+    align-items: center;
+    text-align: end;
+    justify-content: start;
+    gap: 0px 8px;
+    grid-template-areas:
+    "topleftlabel . . . ."
+    "tllnglb tllngin tllatlb tllatin btn"
+
+    "toprightlabel . . . btn"
+    "trlnglb trlngin trlatlb trlatin btn"
+
+    "bottomleftlabel . . . btn"
+    "bllnglb bllngin bllatlb bllatin btn"
+
+    "bottomrightlabel . . . btn"
+    "brlnglb brlngin brlatlb brlatin btn"
+
+    ". . . . ."
+    "zoomlb zoomin . . ."; 
+}
+
 .coords-lng-label {
     grid-area: lnglb;
 }
@@ -42,12 +92,39 @@
 .coords-lat-input {
     grid-area: latin;
 }
+
 .coords-clear-btn {
     grid-area: btn;
 }
+
 .coords-zoom-label {
     grid-area: zoomlb;
 }
 .coords-zoom-input {
     grid-area: zoomin;
 }
+
+.topleftlabel { font-weight: bold; grid-area: topleftlabel; }
+.toprightlabel { font-weight: bold; grid-area: toprightlabel; }
+.bottomleftlabel { font-weight: bold; grid-area: bottomleftlabel; }
+.bottomrightlabel { font-weight: bold; grid-area: bottomrightlabel; }
+
+.coords-lng-tl-lb { grid-area: tllnglb; }
+.coords-lng-tl-in { grid-area: tllngin; }
+.coords-lat-tl-lb { grid-area: tllatlb; }
+.coords-lat-tl-in { grid-area: tllatin; }
+
+.coords-lng-tr-lb { grid-area: trlnglb; }
+.coords-lng-tr-in { grid-area: trlngin; }
+.coords-lat-tr-lb { grid-area: trlatlb; }
+.coords-lat-tr-in { grid-area: trlatin; }
+
+.coords-lng-bl-lb { grid-area: bllnglb; }
+.coords-lng-bl-in { grid-area: bllngin; }
+.coords-lat-bl-lb { grid-area: bllatlb; }
+.coords-lat-bl-in { grid-area: bllatin; }
+
+.coords-lng-br-lb { grid-area: brlnglb; }
+.coords-lng-br-in { grid-area: brlngin; }
+.coords-lat-br-lb { grid-area: brlatlb; }
+.coords-lat-br-in { grid-area: brlatin; }

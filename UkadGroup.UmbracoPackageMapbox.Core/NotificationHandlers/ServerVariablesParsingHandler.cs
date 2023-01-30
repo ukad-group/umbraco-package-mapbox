@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Routing;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Routing;
 using UkadGroup.UmbracoPackageMapbox.Core.Controllers;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Extensions;
 
-namespace UkadGroup.UmbracoPackageMapbox.Core.Services
+namespace UkadGroup.UmbracoPackageMapbox.Core.NotificationHandlers
 {
     internal class ServerVariablesParsingHandler :
         INotificationHandler<ServerVariablesParsingNotification>

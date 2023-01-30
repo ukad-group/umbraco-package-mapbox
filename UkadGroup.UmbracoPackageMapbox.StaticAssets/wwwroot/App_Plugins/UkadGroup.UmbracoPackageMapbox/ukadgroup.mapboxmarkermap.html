@@ -12,8 +12,7 @@
 
     <div class="map-controls mb3">
         <div ng-if="vm.showSetMarkerByCoordinates" class="coords-lng-label">
-            <localize key="ukadgroup_longitude" class="ml3">Longitude</localize
-            >:
+            Longitude:
         </div>
         <input
             ng-if="vm.showSetMarkerByCoordinates"
@@ -38,7 +37,7 @@
         </umb-button>
 
         <div ng-if="vm.showSetMarkerByCoordinates" class="coords-lat-label">
-            <localize key="ukadgroup_latitude">Latitude</localize>:
+            Latitude:
         </div>
         <input
             ng-if="vm.showSetMarkerByCoordinates"
@@ -50,9 +49,7 @@
             class="coords-lat-input"
         />
 
-        <div ng-if="vm.showZoom" class="coords-zoom-label">
-            <localize key="ukadgroup_zoom">Zoom</localize>:
-        </div>
+        <div ng-if="vm.showZoom" class="coords-zoom-label">Zoom:</div>
         <input
             ng-if="vm.showZoom"
             type="number"

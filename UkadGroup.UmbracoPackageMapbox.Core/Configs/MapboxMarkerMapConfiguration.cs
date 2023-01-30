@@ -11,7 +11,7 @@ namespace UkadGroup.UmbracoPackageMapbox.Core.Configs
         public string AccessToken { get; set; }
 
         [DataMember(Name = "defaultPosition")]
-        [ConfigurationField("defaultPosition", "Default Position", Constants.EditorView)]
+        [ConfigurationField("defaultPosition", "Default Position", Constants.MarkerMapEditorView)]
         public MapboxMarkerMapModel DefaultPosition { get; set; }
 
         [DataMember(Name = "showSearch")]

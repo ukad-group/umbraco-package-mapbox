@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 
-namespace UkadGroup.UmbracoPackageMapbox.Core.Services
+namespace UkadGroup.UmbracoPackageMapbox.Core.PropertyConverters
 {
     public class MapboxMarkerMapPropertyValueConverter : PropertyValueConverterBase
     {
@@ -18,7 +18,7 @@ namespace UkadGroup.UmbracoPackageMapbox.Core.Services
             _mapboxConfig = mapboxConfig;
         }
 
-        public override bool IsConverter(IPublishedPropertyType propertyType) => propertyType.EditorAlias.Equals(Constants.EditorAlias);
+        public override bool IsConverter(IPublishedPropertyType propertyType) => propertyType.EditorAlias.Equals(Constants.MarkerMapEditorAlias);
 
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType) => typeof(MapboxMarkerMapModel);
 

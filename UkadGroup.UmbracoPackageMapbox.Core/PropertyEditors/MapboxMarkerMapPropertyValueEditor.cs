@@ -1,4 +1,4 @@
-﻿using UkadGroup.UmbracoPackageMapbox.Core.Services;
+﻿using UkadGroup.UmbracoPackageMapbox.Core.Validators;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;

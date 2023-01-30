@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
 
-namespace UkadGroup.UmbracoPackageMapbox.Core.Services
+namespace UkadGroup.UmbracoPackageMapbox.Core.Validators
 {
     public class MapboxMarkerMapRequiredValidator : IValueRequiredValidator
     {

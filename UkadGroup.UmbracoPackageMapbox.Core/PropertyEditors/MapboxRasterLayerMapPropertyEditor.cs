@@ -11,18 +11,18 @@ namespace UkadGroup.UmbracoPackageMapbox.Core.PropertyEditors
     /// Represents a decimal property and parameter editor.
     /// </summary>
     [DataEditor(
-        Constants.MarkerMapEditorAlias,
+        Constants.RasterLayerMapEditorAlias,
         EditorType.PropertyValue | EditorType.MacroParameter,
-        Constants.MarkerMapEditorName,
-        Constants.MarkerMapEditorView,
-        Icon = Constants.MarkerMapEditorIcon,
+        Constants.RasterLayerMapEditorName,
+        Constants.RasterLayerMapEditorView,
+        Icon = Constants.RasterLayerMapEditorIcon,
         ValueType = ValueTypes.Json)]
-    public class MapboxMarkerMapPropertyEditor : DataEditor
+    public class MapboxRasterLayerMapPropertyEditor : DataEditor
     {
         private readonly IIOHelper _ioHelper;
         private readonly IEditorConfigurationParser _editorConfigurationParser;
 
-        public MapboxMarkerMapPropertyEditor(
+        public MapboxRasterLayerMapPropertyEditor(
             IDataValueEditorFactory dataValueEditorFactory,
             IIOHelper ioHelper,
             IEditorConfigurationParser editorConfigurationParser,
@@ -34,9 +34,9 @@ namespace UkadGroup.UmbracoPackageMapbox.Core.PropertyEditors
         }
 
         /// <inheritdoc />
-        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MapboxMarkerMapPropertyValueEditor>(Attribute);
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MapboxRasterLayerMapPropertyValueEditor>(Attribute);
 
         /// <inheritdoc />
-        protected override IConfigurationEditor CreateConfigurationEditor() => new MapboxMarkerMapConfigurationEditor(_ioHelper, _editorConfigurationParser);
+        protected override IConfigurationEditor CreateConfigurationEditor() => new MapboxRasterLayerMapConfigurationEditor(_ioHelper, _editorConfigurationParser);
     }
 }
