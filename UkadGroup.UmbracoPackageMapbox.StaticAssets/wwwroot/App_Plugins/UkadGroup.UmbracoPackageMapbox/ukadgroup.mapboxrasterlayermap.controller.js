@@ -19,27 +19,42 @@
         ) {
             const vm = this;
 
-            vm.setMarker = setMarker;
-            vm.clearMarker = clearMarker;
+            vm.updatePoints = updatePoints;
+            vm.clearPoints = clearPoints;
             vm.setZoom = setZoom;
+            vm.selectImage = selectImage;
+            vm.removeImage = removeImage;
 
-            vm.inputId = "osm_search_" + String.CreateGuid();
-            vm.inputLatId = "osm_Lat_" + String.CreateGuid();
-            vm.inputLngId = "osm_Lng_" + String.CreateGuid();
-            vm.inputZoomId = "osm_Zoom_" + String.CreateGuid();
+            vm.topLeftInputLatId = "tl_Lat_" + String.CreateGuid();
+            vm.topLeftInputLngId = "tl_Lng_" + String.CreateGuid();
+
+            vm.topRightInputLatId = "tr_Lat_" + String.CreateGuid();
+            vm.topRightInputLngId = "tr_Lng_" + String.CreateGuid();
+
+            vm.bottomLeftInputLatId = "bl_Lat_" + String.CreateGuid();
+            vm.bottomLeftInputLngId = "bl_Lng_" + String.CreateGuid();
+
+            vm.bottomRightInputLatId = "br_Lat_" + String.CreateGuid();
+            vm.bottomRightInputLngId = "br_Lng_" + String.CreateGuid();
+
+            vm.inputZoomId = "zoom_" + String.CreateGuid();
             vm.mapId = "map_" + String.CreateGuid();
 
             $element.find("[data-map]")[0].id = vm.mapId;
 
             vm.showLoader = true;
             vm.error = "";
-            vm.currentMarker = null;
+            vm.image = "";
+
+            vm.dots = {
+                topLeft: [],
+                topRight: [],
+                bottomRight: [],
+                bottomLeft: [],
+            };
+
             vm.accessToken = "";
 
-            vm.image =
-                $scope.model.config.defaultImage != null
-                    ? $scope.model.config.defaultImage
-                    : "";
             vm.showSetLayerByCoordinates =
                 $scope.model.config.showSetLayerByCoordinates != null
                     ? Object.toBoolean(
@@ -79,10 +94,7 @@
                     zoom: 9,
                 };
 
-                const initValue =
-                    $scope.model.value ||
-                    $scope.model.config.defaultPosition ||
-                    defaultValue;
+                const initValue = $scope.model.value || defaultValue;
 
                 if (vm.accessToken === "") {
                     vm.error =
@@ -113,10 +125,8 @@
                     animate: false,
                     style: "mapbox://styles/mapbox/streets-v12",
                     center: [
-                        initValue.marker?.longitude ??
-                            boundingBox.getCenter().lng,
-                        initValue.marker?.latitude ??
-                            boundingBox.getCenter().lat,
+                        boundingBox.getCenter().lng,
+                        boundingBox.getCenter().lat,
                     ],
                     zoom: initValue.zoom,
                 }).fitBounds(boundingBox);
@@ -125,52 +135,307 @@
                 vm.map.dragRotate.disable();
                 vm.map.touchZoomRotate.disableRotation();
 
+                initImageWithPoints(initValue);
+
                 if (vm.scrollWheelZoom == false) {
                     vm.map.scrollZoom.disable();
                 }
 
-                vm.map.on("click", onMapClick);
-                vm.map.on("moveend", updateModel);
-                vm.map.on("zoomend", updateModel);
+                if (vm.showZoom) {
+                    vm.inputZoom = initValue.zoom;
+                }
 
-                vm.map.on("contextmenu", function () {
+                // vm.map.on("contextmenu", function () {
+                //     if (
+                //         vm.allowClear !== true &&
+                //         Object.toBoolean($scope.model.config.allowClear) !==
+                //             true
+                //     ) {
+                //         return;
+                //     }
+                //     clearPoints();
+                // });
+
+                vm.map.on("load", () => {
+                    const canvas = vm.map.getCanvasContainer();
+
+                    const sizeMultiplier = 0.15;
+                    let imageAspectRatio;
+
+                    const mapContainer = document.getElementById(vm.mapId);
+                    let containerSize = {
+                        width: mapContainer.offsetWidth,
+                        height: mapContainer.height,
+                    };
+                    let mouseDownCoords;
+                    let isDragging = false;
+                    let imageDraggingStartDots;
+                    let isDraggingDot = false;
+
+                    const img = new Image();
+                    img.onload = function () {
+                        imageAspectRatio = this.width / this.height;
+                    };
+                    img.src = vm.image;
+
+                    const drawImage = () => {
+                        if (vm.map.getLayer("image")) {
+                            vm.map.removeLayer("image");
+                        }
+                        if (vm.map.getSource("image")) {
+                            vm.map.removeSource("image");
+                        }
+
+                        vm.map.addSource("image", {
+                            type: "image",
+                            url: vm.image,
+                            coordinates: Object.values(vm.dots),
+                        });
+                        vm.map.addLayer({
+                            id: "image",
+                            type: "raster",
+                            source: "image",
+                            paint: {
+                                "raster-fade-duration": 0,
+                            },
+                        });
+                        vm.map.on("mousedown", (e) => {
+                            const isOnImage = isPointInsidePolygon(
+                                e.lngLat.toArray(),
+                                Object.values(vm.dots)
+                            );
+                            if (!isOnImage) return;
+
+                            vm.map.dragPan.disable();
+                            vm.map.once("mouseup", () => {
+                                vm.map.dragPan.enable();
+                            });
+                        });
+                    };
+
+                    const drawDots = () => {
+                        Object.values(vm.dots).map((dot, i) => {
+                            const pointName = Object.keys(vm.dots)[i];
+                            const pointId = `point-${i}`;
+
+                            if (vm.map.getLayer(pointId)) {
+                                vm.map.removeLayer(pointId);
+                            }
+                            if (vm.map.getSource(pointId)) {
+                                vm.map.removeSource(pointId);
+                            }
+
+                            vm.map.addSource(pointId, {
+                                type: "geojson",
+                                data: getDotGeoJson(dot),
+                            });
+                            vm.map.addLayer({
+                                id: pointId,
+                                type: "circle",
+                                source: pointId,
+                                paint: {
+                                    "circle-radius": 7,
+                                    "circle-color": "#3bb2d0", // red color
+                                },
+                            });
+                            vm.map.on("mouseenter", pointId, () => {
+                                vm.map.setPaintProperty(
+                                    pointId,
+                                    "circle-color",
+                                    "#F84C4C"
+                                );
+                                canvas.style.cursor = "move";
+                            });
+
+                            vm.map.on("mouseleave", pointId, () => {
+                                vm.map.setPaintProperty(
+                                    pointId,
+                                    "circle-color",
+                                    "#3bb2d0"
+                                );
+                                canvas.style.cursor = "";
+                            });
+
+                            vm.map.on("mousedown", pointId, (e) => {
+                                e.preventDefault();
+
+                                canvas.style.cursor = "grab";
+                                setLayerProperty("image", 0.5);
+
+                                const onDragPoint = (e) => {
+                                    isDraggingDot = true;
+                                    vm.dots[pointName] = e.lngLat.toArray();
+                                    vm.map
+                                        .getSource(pointId)
+                                        ?.setData(
+                                            getDotGeoJson(e.lngLat.toArray())
+                                        );
+                                    vm.map
+                                        .getSource("image")
+                                        ?.setCoordinates(
+                                            Object.values(vm.dots)
+                                        );
+                                };
+
+                                vm.map.on("mousemove", onDragPoint);
+                                vm.map.once("mouseup", (e) => {
+                                    isDraggingDot = false;
+                                    setLayerProperty("image", 1);
+                                    vm.map.off("mousemove", onDragPoint);
+                                });
+                            });
+                        });
+                    };
+
+                    vm.map.on("mousedown", (e) => {
+                        mouseDownCoords = e.lngLat.toArray();
+                        imageDraggingStartDots = vm.dots;
+                    });
+
+                    vm.map.on("mousemove", (e) => {
+                        if (isDraggingDot || !imageDraggingStartDots) return;
+
+                        isDragging =
+                            mouseDownCoords &&
+                            e.lngLat.toArray().join("") !==
+                                mouseDownCoords.join("");
+
+                        if (!isDragging) return;
+
+                        setLayerProperty("image", 0.5);
+
+                        const coords = e.lngLat.toArray();
+                        const delta = mouseDownCoords.map(
+                            (value, i) => coords[i] - value
+                        );
+
+                        vm.dots = {
+                            topLeft: imageDraggingStartDots.topLeft.map(
+                                (value, i) => value + delta[i]
+                            ),
+                            topRight: imageDraggingStartDots.topRight.map(
+                                (value, i) => value + delta[i]
+                            ),
+                            bottomRight: imageDraggingStartDots.bottomRight.map(
+                                (value, i) => value + delta[i]
+                            ),
+                            bottomLeft: imageDraggingStartDots.bottomLeft.map(
+                                (value, i) => value + delta[i]
+                            ),
+                        };
+
+                        for (let i = 0; i < 4; i++) {
+                            const pointId = `point-${i}`;
+                            vm.map
+                                .getSource(pointId)
+                                ?.setData(
+                                    getDotGeoJson(Object.values(vm.dots)[i])
+                                );
+                            setLayerProperty(
+                                pointId,
+                                { duration: 0 },
+                                "circle-opacity-transition"
+                            );
+                            setLayerProperty(pointId, 0, "circle-opacity");
+                        }
+
+                        vm.map
+                            .getSource("image")
+                            ?.setCoordinates(Object.values(vm.dots));
+                    });
+
+                    vm.map.on("mouseup", (e) => {
+                        let wasDragging =
+                            mouseDownCoords &&
+                            e.lngLat.toArray().join("") !==
+                                mouseDownCoords.join("");
+
+                        mouseDownCoords = null;
+                        isDragging = false;
+                        imageDraggingStartDots = null;
+                        setLayerProperty("image", 1);
+
+                        for (let i = 0; i < 4; i++) {
+                            const pointId = `point-${i}`;
+
+                            vm.map
+                                .getSource(pointId)
+                                ?.setData(
+                                    getDotGeoJson(Object.values(vm.dots)[i])
+                                );
+
+                            setLayerProperty(pointId, 1, "circle-opacity");
+                        }
+
+                        if (wasDragging) {
+                            return;
+                        }
+
+                        const imageWidth = containerSize.width * sizeMultiplier;
+                        const imageHeight = imageWidth / imageAspectRatio;
+
+                        const center = e.point;
+                        const canvasDots = {
+                            topLeft: {
+                                x: center.x - imageWidth / 2,
+                                y: center.y - imageHeight / 2,
+                            },
+                            topRight: {
+                                x: center.x + imageWidth / 2,
+                                y: center.y - imageHeight / 2,
+                            },
+                            bottomRight: {
+                                x: center.x + imageWidth / 2,
+                                y: center.y + imageHeight / 2,
+                            },
+                            bottomLeft: {
+                                x: center.x - imageWidth / 2,
+                                y: center.y + imageHeight / 2,
+                            },
+                        };
+
+                        vm.dots = {
+                            topLeft: vm.map
+                                .unproject(canvasDots.topLeft)
+                                .toArray(),
+                            topRight: vm.map
+                                .unproject(canvasDots.topRight)
+                                .toArray(),
+                            bottomRight: vm.map
+                                .unproject(canvasDots.bottomRight)
+                                .toArray(),
+                            bottomLeft: vm.map
+                                .unproject(canvasDots.bottomLeft)
+                                .toArray(),
+                        };
+
+                        drawImage();
+                        drawDots();
+                        updateModel();
+                    });
+
+                    vm.map.on("moveend", updateModel);
+                    vm.map.on("zoomend", updateModel);
+
                     if (
-                        vm.allowClear !== true &&
-                        Object.toBoolean($scope.model.config.allowClear) !==
-                            true
+                        vm.image &&
+                        vm.dots.topLeft[0] &&
+                        vm.dots.topLeft[1] &&
+                        vm.dots.topRight[0] &&
+                        vm.dots.topRight[1] &&
+                        vm.dots.bottomLeft[0] &&
+                        vm.dots.bottomLeft[1] &&
+                        vm.dots.bottomRight[0] &&
+                        vm.dots.bottomRight[1]
                     ) {
-                        return;
+                        drawImage();
+                        drawDots();
                     }
-                    clearMarker();
-                });
 
-                if (initValue.marker) {
-                    vm.currentMarker = new mapboxgl.Marker({ draggable: true })
-                        .setLngLat([
-                            initValue.marker.longitude,
-                            initValue.marker.latitude,
-                        ])
-                        .addTo(vm.map);
-
-                    if (vm.showSetLayerByCoordinates) {
-                        vm.inputLat = initValue.marker.latitude;
-                        vm.inputLng = initValue.marker.longitude;
-                    }
-                }
-
-                if (vm.currentMarker) {
-                    vm.currentMarker.on("dragend", updateModel);
-                }
-
-                vm.map.on("load", (e) => {
                     vm.map.resize();
                     vm.map.fitBounds(boundingBox);
                     vm.map.setZoom(initValue.zoom);
                 });
-
-                if (vm.showZoom) {
-                    vm.inputZoom = initValue.zoom;
-                }
 
                 vm.map.on("idle", (e) => {
                     vm.map.resize();
@@ -178,7 +443,59 @@
                 });
             }
 
-            $scope.selectImage = function(item) {
+            function initImageWithPoints(initValue) {
+                if (initValue.image) {
+                    vm.image = initValue.image;
+                }
+
+                if (initValue.topLeftPoint) {
+                    vm.dots.topLeft[0] = initValue.topLeftPoint.longitude;
+                    vm.dots.topLeft[1] = initValue.topLeftPoint.latitude;
+
+                    if (vm.showSetLayerByCoordinates) {
+                        vm.topLeftInputLat = initValue.topLeftPoint.latitude;
+                        vm.topLeftInputLng = initValue.topLeftPoint.longitude;
+                    }
+                }
+
+                if (initValue.topRightPoint) {
+                    vm.dots.topRight[0] = initValue.topRightPoint.longitude;
+                    vm.dots.topRight[1] = initValue.topRightPoint.latitude;
+
+                    if (vm.showSetLayerByCoordinates) {
+                        vm.topRightInputLat = initValue.topRightPoint.latitude;
+                        vm.topRightInputLng = initValue.topRightPoint.longitude;
+                    }
+                }
+
+                if (initValue.bottomLeftPoint) {
+                    vm.dots.bottomLeft[0] = initValue.bottomLeftPoint.longitude;
+                    vm.dots.bottomLeft[1] = initValue.bottomLeftPoint.latitude;
+
+                    if (vm.showSetLayerByCoordinates) {
+                        vm.bottomLeftInputLat =
+                            initValue.bottomLeftPoint.latitude;
+                        vm.bottomLeftInputLng =
+                            initValue.bottomLeftPoint.longitude;
+                    }
+                }
+
+                if (initValue.bottomRightPoint) {
+                    vm.dots.bottomRight[0] =
+                        initValue.bottomRightPoint.longitude;
+                    vm.dots.bottomRight[1] =
+                        initValue.bottomRightPoint.latitude;
+
+                    if (vm.showSetLayerByCoordinates) {
+                        vm.bottomRightInputLat =
+                            initValue.bottomRightPoint.latitude;
+                        vm.bottomRightInputLng =
+                            initValue.bottomRightPoint.longitude;
+                    }
+                }
+            }
+
+            function selectImage() {
                 editorService.mediaPicker({
                     onlyImages: true,
                     multiPicker: false,
@@ -195,9 +512,9 @@
                         editorService.close();
                     },
                     submit: function (data) {
-                        console.log(data.selection[0]);
                         processSelection(data.selection[0].image);
                         editorService.close();
+                        updateModel();
                     },
                 });
             }
@@ -206,44 +523,71 @@
                 vm.image = selection;
             }
 
-            $scope.removeImage = function()
-            {
-                vm.image = '';
+            function removeImage() {
+                vm.image = "";
+                clearPoints();
+                updateModel();
             }
 
-            function clearMarker(e, skipUpdate) {
-                if (vm.currentMarker) {
-                    vm.currentMarker.remove(vm.map);
-                    vm.currentMarker = null;
+            function clearPoints(e, skipUpdate) {
+                if (vm.dots.topLeft) {
+                    vm.dots.topLeft = [];
                 }
+
+                if (vm.dots.topRight) {
+                    vm.dots.topRight = [];
+                }
+
+                if (vm.dots.bottomLeft) {
+                    vm.dots.bottomLeft = [];
+                }
+
+                if (vm.dots.bottomRight) {
+                    vm.dots.bottomRight = [];
+                }
+
+                if (vm.map.getLayer("image")) {
+                    vm.map.removeLayer("image");
+                }
+
+                if (vm.map.getSource("image")) {
+                    vm.map.removeSource("image");
+                }
+
+                Object.values(vm.dots).map((dot, i) => {
+                    const pointId = `point-${i}`;
+
+                    if (vm.map.getLayer(pointId)) {
+                        vm.map.removeLayer(pointId);
+                    }
+                    if (vm.map.getSource(pointId)) {
+                        vm.map.removeSource(pointId);
+                    }
+                });
 
                 if (!skipUpdate) {
                     updateModel();
                 }
             }
 
-            function setMarker() {
-                if (
-                    !Number.isFinite(vm.inputLat) ||
-                    !Number.isFinite(vm.inputLng)
-                ) {
-                    return;
-                }
+            function updatePoints() {
+                // if (
+                //     !Number.isFinite(vm.inputLat) ||
+                //     !Number.isFinite(vm.inputLng)
+                // ) {
+                //     return;
+                // }
 
-                clearMarker();
-
-                const lngLat = [vm.inputLng, vm.inputLat];
-
-                vm.map.jumpTo({
-                    center: lngLat,
-                });
-                vm.currentMarker = new mapboxgl.Marker({ draggable: true })
-                    .setLngLat(lngLat)
-                    .addTo(vm.map);
-
-                if (vm.currentMarker) {
-                    vm.currentMarker.on("dragend", updateModel);
-                }
+                // // const lngLat = [vm.inputLng, vm.inputLat];
+                // // vm.map.jumpTo({
+                // //     center: lngLat,
+                // // });
+                // vm.currentMarker = new mapboxgl.Marker({ draggable: true })
+                //     .setLngLat(lngLat)
+                //     .addTo(vm.map);
+                // if (vm.currentMarker) {
+                //     vm.currentMarker.on("dragend", updateModel);
+                // }
 
                 updateModel();
             }
@@ -261,26 +605,15 @@
                 updateModel();
             }
 
-            function onMapClick(e) {
-                clearMarker(e, true);
-
-                vm.map.jumpTo({
-                    center: e.lngLat,
-                });
-
-                vm.currentMarker = new mapboxgl.Marker({ draggable: true })
-                    .setLngLat([e.lngLat.lng, e.lngLat.lat])
-                    .addTo(vm.map);
-
-                if (vm.currentMarker) {
-                    vm.currentMarker.on("dragend", updateModel);
-                }
-            }
-
             function updateModel() {
                 $timeout(function () {
                     $scope.model.value = {};
-                    $scope.model.value.marker = {};
+                    $scope.model.value.topLeftPoint = {};
+                    $scope.model.value.topRightPoint = {};
+                    $scope.model.value.bottomLeftPoint = {};
+                    $scope.model.value.bottomRightPoint = {};
+
+                    $scope.model.value.image = vm.image ? vm.image : null;
 
                     $scope.model.value.zoom = vm.map.getZoom();
                     vm.inputZoom = vm.map.getZoom();
@@ -307,24 +640,146 @@
                     $scope.model.value.boundingBox.southWestCorner.longitude =
                         southWestCorner.lng;
 
-                    if (vm.currentMarker) {
-                        const marker = vm.currentMarker.getLngLat();
-
-                        if (!$scope.model.value.marker) {
-                            $scope.model.value.marker = {};
-                        }
-
-                        $scope.model.value.marker.latitude = marker.lat;
-                        $scope.model.value.marker.longitude = marker.lng;
-                        vm.inputLat = marker.lat;
-                        vm.inputLng = marker.lng;
-                    } else {
-                        $scope.model.value.marker = null;
-                        vm.inputLat = null;
-                        vm.inputLng = null;
-                    }
+                    updateDotsModel();
                 }, 0);
             }
+
+            function updateDotsModel() {
+                if (vm.dots.topLeft) {
+                    const point = {
+                        lng: vm.dots.topLeft[0],
+                        lat: vm.dots.topLeft[1],
+                    };
+
+                    if (!$scope.model.value.topLeftPoint) {
+                        $scope.model.value.topLeftPoint = {};
+                    }
+
+                    $scope.model.value.topLeftPoint.latitude = point.lat;
+                    $scope.model.value.topLeftPoint.longitude = point.lng;
+                    vm.topLeftInputLat = point.lat;
+                    vm.topLeftInputLng = point.lng;
+                } else {
+                    $scope.model.value.topLeftPoint = null;
+                    vm.topLeftInputLat = null;
+                    vm.topLeftInputLng = null;
+                }
+
+                if (vm.dots.topRight) {
+                    const point = {
+                        lng: vm.dots.topRight[0],
+                        lat: vm.dots.topRight[1],
+                    };
+
+                    if (!$scope.model.value.topRightPoint) {
+                        $scope.model.value.topRightPoint = {};
+                    }
+
+                    $scope.model.value.topRightPoint.latitude = point.lat;
+                    $scope.model.value.topRightPoint.longitude = point.lng;
+                    vm.topRightInputLat = point.lat;
+                    vm.topRightInputLng = point.lng;
+                } else {
+                    $scope.model.value.topLeftPoint = null;
+                    vm.topRightInputLat = null;
+                    vm.topRightInputLng = null;
+                }
+
+                if (vm.dots.bottomLeft) {
+                    const point = {
+                        lng: vm.dots.bottomLeft[0],
+                        lat: vm.dots.bottomLeft[1],
+                    };
+
+                    if (!$scope.model.value.bottomLeftPoint) {
+                        $scope.model.value.bottomLeftPoint = {};
+                    }
+
+                    $scope.model.value.bottomLeftPoint.latitude = point.lat;
+                    $scope.model.value.bottomLeftPoint.longitude = point.lng;
+                    vm.bottomLeftInputLat = point.lat;
+                    vm.bottomLeftInputLng = point.lng;
+                } else {
+                    $scope.model.value.bottomLeftPoint = null;
+                    vm.bottomLeftInputLat = null;
+                    vm.bottomLeftInputLng = null;
+                }
+
+                if (vm.dots.bottomRight) {
+                    const point = {
+                        lng: vm.dots.bottomRight[0],
+                        lat: vm.dots.bottomRight[1],
+                    };
+
+                    if (!$scope.model.value.bottomRightPoint) {
+                        $scope.model.value.bottomRightPoint = {};
+                    }
+
+                    $scope.model.value.bottomRightPoint.latitude = point.lat;
+                    $scope.model.value.bottomRightPoint.longitude = point.lng;
+                    vm.bottomRightInputLat = point.lat;
+                    vm.bottomRightInputLng = point.lng;
+                } else {
+                    $scope.model.value.bottomRightPoint = null;
+                    vm.bottomRightInputLat = null;
+                    vm.bottomRightInputLng = null;
+                }
+            }
+
+            const getDotGeoJson = (coordinates) => {
+                return {
+                    type: "FeatureCollection",
+                    features: [
+                        {
+                            type: "Feature",
+                            geometry: {
+                                type: "Point",
+                                coordinates,
+                            },
+                        },
+                    ],
+                };
+            };
+
+            const setLayerProperty = (layer, value, name) => {
+                if (!vm.map.getLayer(layer)) return;
+                try {
+                    vm.map.setPaintProperty(
+                        layer,
+                        name || "raster-opacity",
+                        value
+                    );
+                } catch (e) {
+                    console.log(e);
+                }
+            };
+
+            const isPointInsidePolygon = (point, polygonDots) => {
+                // ray-casting algorithm based on
+                // https://wrf.ecse.rpi.edu/Research/Short_Notes/pnpoly.html/pnpoly.html
+
+                var x = point[0],
+                    y = point[1];
+
+                var inside = false;
+                for (
+                    var i = 0, j = polygonDots.length - 1;
+                    i < polygonDots.length;
+                    j = i++
+                ) {
+                    var xi = polygonDots[i][0],
+                        yi = polygonDots[i][1];
+                    var xj = polygonDots[j][0],
+                        yj = polygonDots[j][1];
+
+                    var intersect =
+                        yi > y != yj > y &&
+                        x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+                    if (intersect) inside = !inside;
+                }
+
+                return inside;
+            };
 
             async function getSettings() {
                 const response = await umbRequestHelper.resourcePromise(

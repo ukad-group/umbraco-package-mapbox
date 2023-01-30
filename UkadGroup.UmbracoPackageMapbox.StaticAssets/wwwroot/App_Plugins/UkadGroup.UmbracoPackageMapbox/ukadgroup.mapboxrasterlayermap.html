@@ -1,177 +1,182 @@
 <div
     ng-controller="UkadGroup.UmbracoPackageMapbox.RasterLayerMap.Controller as vm"
 >
-
-<div class="raster-layer-map-container">
-    <div class="mb3">
-        <div ng-show="vm.image">
-            <div class="image-picker ng-scope" ng-click="selectImage()">
-                <img src="{{vm.image}}" />
+    <div class="raster-layer-map-container">
+        <div class="mb3">
+            <div ng-show="vm.image">
+                <div class="image-picker ng-scope" ng-click="vm.selectImage()">
+                    <img src="{{vm.image}}" />
+                </div>
+                <div class="image-actions">
+                    <button
+                        class="btn btn-info btn-small edit"
+                        type="button"
+                        ng-click="vm.selectImage()"
+                        title="Edit"
+                    >
+                        Edit
+                    </button>
+                    <button
+                        class="btn btn-danger btn-small delete"
+                        type="button"
+                        ng-click="vm.removeImage()"
+                        title="Delete"
+                    >
+                        Delete
+                    </button>
+                </div>
             </div>
-            <div class="image-actions">
-                <button
-                    class="btn btn-info btn-small edit"
-                    type="button"
-                    ng-click="selectImage()"
-                    title="Edit"
-                >
-                    Edit
-                </button>
-                <button
-                    class="btn btn-danger btn-small delete"
-                    type="button"
-                    ng-click="removeImage()"
-                    title="Delete"
-                >
-                    Delete
-                </button>
+
+            <div
+                class="image-picker ng-scope"
+                ng-click="vm.selectImage()"
+                ng-show="!vm.image"
+            >
+                <div class="help-text">Click to select image</div>
             </div>
         </div>
 
-        <div
-            class="image-picker ng-scope"
-            ng-click="selectImage()"
-            ng-show="!vm.image"
-        >
-            <div class="help-text">Click to select image</div>
+        <div class="raster-layer-map-controls mb3">
+            <div ng-if="vm.showSetLayerByCoordinates" class="topleftlabel">
+                Top left point:
+            </div>
+            <div ng-if="vm.showSetLayerByCoordinates" class="coords-lng-tl-lb">
+                Longitude:
+            </div>
+            <input
+                ng-if="vm.showSetLayerByCoordinates"
+                type="number"
+                ng-model="vm.topLeftInputLng"
+                id="{{vm.topLeftInputLngId}}"
+                ng-change="vm.updatePoints()"
+                placeholder="Longitude"
+                class="coords-lng-tl-in"
+            />
+
+            <div ng-if="vm.showSetLayerByCoordinates" class="coords-lat-tl-lb">
+                Latitude:
+            </div>
+            <input
+                ng-if="vm.showSetLayerByCoordinates"
+                type="number"
+                ng-model="vm.topLeftInputLat"
+                id="{{vm.topLeftInputLatId}}"
+                ng-change="vm.updatePoints()"
+                placeholder="Latitude"
+                class="coords-lat-tl-in"
+            />
+
+            <div ng-if="vm.showSetLayerByCoordinates" class="toprightlabel">
+                Top right point:
+            </div>
+            <div ng-if="vm.showSetLayerByCoordinates" class="coords-lng-tr-lb">
+                Longitude:
+            </div>
+            <input
+                ng-if="vm.showSetLayerByCoordinates"
+                type="number"
+                ng-model="vm.topRightInputLng"
+                id="{{vm.topRightInputLngId}}"
+                ng-change="vm.updatePoints()"
+                placeholder="Longitude"
+                class="coords-lng-tr-in"
+            />
+
+            <div ng-if="vm.showSetLayerByCoordinates" class="coords-lat-tr-lb">
+                Latitude:
+            </div>
+            <input
+                ng-if="vm.showSetLayerByCoordinates"
+                type="number"
+                ng-model="vm.topRightInputLat"
+                id="{{vm.topRightInputLatId}}"
+                ng-change="vm.updatePoints()"
+                placeholder="Latitude"
+                class="coords-lat-tr-in"
+            />
+
+            <div ng-if="vm.showSetLayerByCoordinates" class="bottomleftlabel">
+                Bottom left point:
+            </div>
+            <div ng-if="vm.showSetLayerByCoordinates" class="coords-lng-bl-lb">
+                Longitude:
+            </div>
+            <input
+                ng-if="vm.showSetLayerByCoordinates"
+                type="number"
+                ng-model="vm.bottomLeftInputLng"
+                id="{{vm.bottomLeftInputLngId}}"
+                ng-change="vm.updatePoints()"
+                placeholder="Longitude"
+                class="coords-lng-bl-in"
+            />
+
+            <div ng-if="vm.showSetLayerByCoordinates" class="coords-lat-bl-lb">
+                Latitude:
+            </div>
+            <input
+                ng-if="vm.showSetLayerByCoordinates"
+                type="number"
+                ng-model="vm.bottomLeftInputLat"
+                id="{{vm.bottomLeftInputLatId}}"
+                ng-change="vm.updatePoints()"
+                placeholder="Latitude"
+                class="coords-lat-bl-in"
+            />
+
+            <div ng-if="vm.showSetLayerByCoordinates" class="bottomrightlabel">
+                Bottom right point:
+            </div>
+            <div ng-if="vm.showSetLayerByCoordinates" class="coords-lng-br-lb">
+                Longitude:
+            </div>
+            <input
+                ng-if="vm.showSetLayerByCoordinates"
+                type="number"
+                ng-model="vm.bottomRightInputLng"
+                id="{{vm.bottomRightInputLngId}}"
+                ng-change="vm.updatePoints()"
+                placeholder="Longitude"
+                class="coords-lng-br-in"
+            />
+
+            <div ng-if="vm.showSetLayerByCoordinates" class="coords-lat-br-lb">
+                Latitude:
+            </div>
+            <input
+                ng-if="vm.showSetLayerByCoordinates"
+                type="number"
+                ng-model="vm.bottomRightInputLat"
+                id="{{vm.bottomRightInputLatId}}"
+                ng-change="vm.updatePoints()"
+                placeholder="Latitude"
+                class="coords-lat-br-in"
+            />
+
+            <umb-button
+                ng-if="vm.allowClear && vm.showSetLayerByCoordinates"
+                type="button"
+                label="Clear"
+                label-ley="general_clear"
+                button-style="outline"
+                disabled="!model.value.topLeftPoint && !model.value.topRightPoint && !model.value.bottomLeftPoint && !model.value.bottomRightPoint"
+                action="vm.clearPoints()"
+                class="coords-clear-btn"
+            >
+            </umb-button>
+
+            <div ng-if="vm.showZoom" class="coords-zoom-label mt3">Zoom:</div>
+            <input
+                ng-if="vm.showZoom"
+                type="number"
+                ng-model="vm.inputZoom"
+                id="{{vm.inputZoomId}}"
+                ng-change="vm.setZoom()"
+                placeholder="Zoom"
+                class="coords-zoom-input mt3"
+            />
         </div>
     </div>
-
-    <div class="raster-layer-map-controls mb3">
-        <div ng-if="vm.showSetLayerByCoordinates" class="topleftlabel">Top left point:</div>
-        <div ng-if="vm.showSetLayerByCoordinates" class="coords-lng-tl-lb">
-            Longitude:
-        </div>
-        <input
-            ng-if="vm.showSetLayerByCoordinates"
-            type="number"
-            ng-model="vm.inputLng"
-            id="{{vm.inputLngId}}"
-            ng-change="vm.setMarker()"
-            placeholder="Longitude"
-            class="coords-lng-tl-in"
-        />
-
-        <div ng-if="vm.showSetLayerByCoordinates" class="coords-lat-tl-lb">
-            Latitude:
-        </div>
-        <input
-            ng-if="vm.showSetLayerByCoordinates"
-            type="number"
-            ng-model="vm.inputLat"
-            id="{{vm.inputLatId}}"
-            ng-change="vm.setMarker()"
-            placeholder="Latitude"
-            class="coords-lat-tl-in"
-        />
-
-        <div ng-if="vm.showSetLayerByCoordinates" class="toprightlabel">Top right point:</div>
-        <div ng-if="vm.showSetLayerByCoordinates" class="coords-lng-tr-lb">
-            Longitude:
-        </div>
-        <input
-            ng-if="vm.showSetLayerByCoordinates"
-            type="number"
-            ng-model="vm.inputLng"
-            id="{{vm.inputLngId}}"
-            ng-change="vm.setMarker()"
-            placeholder="Longitude"
-            class="coords-lng-tr-in"
-        />
-
-        <div ng-if="vm.showSetLayerByCoordinates" class="coords-lat-tr-lb">
-            Latitude:
-        </div>
-        <input
-            ng-if="vm.showSetLayerByCoordinates"
-            type="number"
-            ng-model="vm.inputLat"
-            id="{{vm.inputLatId}}"
-            ng-change="vm.setMarker()"
-            placeholder="Latitude"
-            class="coords-lat-tr-in"
-        />
-
-        <div ng-if="vm.showSetLayerByCoordinates" class="bottomleftlabel">Bottom left point:</div>
-        <div ng-if="vm.showSetLayerByCoordinates" class="coords-lng-bl-lb">
-            Longitude:
-        </div>
-        <input
-            ng-if="vm.showSetLayerByCoordinates"
-            type="number"
-            ng-model="vm.inputLng"
-            id="{{vm.inputLngId}}"
-            ng-change="vm.setMarker()"
-            placeholder="Longitude"
-            class="coords-lng-bl-in"
-        />
-
-        <div ng-if="vm.showSetLayerByCoordinates" class="coords-lat-bl-lb">
-            Latitude:
-        </div>
-        <input
-            ng-if="vm.showSetLayerByCoordinates"
-            type="number"
-            ng-model="vm.inputLat"
-            id="{{vm.inputLatId}}"
-            ng-change="vm.setMarker()"
-            placeholder="Latitude"
-            class="coords-lat-bl-in"
-        />
-
-        <div ng-if="vm.showSetLayerByCoordinates" class="bottomrightlabel">Bottom right point:</div>
-        <div ng-if="vm.showSetLayerByCoordinates" class="coords-lng-br-lb">
-            Longitude:
-        </div>
-        <input
-            ng-if="vm.showSetLayerByCoordinates"
-            type="number"
-            ng-model="vm.inputLng"
-            id="{{vm.inputLngId}}"
-            ng-change="vm.setMarker()"
-            placeholder="Longitude"
-            class="coords-lng-br-in"
-        />
-
-        <div ng-if="vm.showSetLayerByCoordinates" class="coords-lat-br-lb">
-            Latitude:
-        </div>
-        <input
-            ng-if="vm.showSetLayerByCoordinates"
-            type="number"
-            ng-model="vm.inputLat"
-            id="{{vm.inputLatId}}"
-            ng-change="vm.setMarker()"
-            placeholder="Latitude"
-            class="coords-lat-br-in"
-        />
-
-        <umb-button
-            ng-if="vm.allowClear && vm.showSetLayerByCoordinates"
-            type="button"
-            label="Clear"
-            label-ley="general_clear"
-            button-style="outline"
-            disabled="!model.value.marker"
-            action="vm.clearMarker()"
-            class="coords-clear-btn"
-        >
-        </umb-button>
-
-        <div ng-if="vm.showZoom" class="coords-zoom-label mt3">Zoom:</div>
-        <input
-            ng-if="vm.showZoom"
-            type="number"
-            ng-model="vm.inputZoom"
-            id="{{vm.inputZoomId}}"
-            ng-change="vm.setZoom()"
-            placeholder="Zoom"
-            class="coords-zoom-input mt3"
-        />
-    </div>
-</div>
-
-
 
     <div ng-show="!vm.showLoader">
         <div data-map="true" class="map"></div>
