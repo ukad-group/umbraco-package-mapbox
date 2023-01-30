@@ -180,6 +180,11 @@
             if (vm.showZoom) {
                 vm.inputZoom = initValue.zoom;
             }
+
+            vm.map.on("idle", (e) => {
+                vm.map.resize();
+                vm.map.setZoom(vm.map.getZoom());
+            });
         }
 
         function clearMarker(e, skipUpdate) {
