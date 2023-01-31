@@ -1,27 +1,49 @@
-# Bergmania.OpenStreetMap [![NuGet](https://img.shields.io/nuget/v/Bergmania.OpenStreetMap.svg?style=modern&label=nuget)](https://www.nuget.org/packages/Bergmania.OpenStreetMap)
-OpenStreetMaps property editor for Umbraco 9+ including property value converter.
+# UkadGroup.UmbracoPackageMapbox
+Mapbox property editors for Umbraco 9+.  
+Allows to create new datatypes of types "Mapbox Marker Map" and "Mapbox Raster Layer Map".
 
-## Features
+## Licensing
+The UmbracoPackageMapbox project is licensed under the [MIT license](https://github.com/ukad-group/umbraco-package-mapbox/blob/master/LICENSE).  
+This project includes some code from [Bergmania.OpenStreetMap](https://github.com/bergmania/Bergmania.OpenStreetMap), also MIT licensed.
+
+## Marker map features
 - Click on exact location on map to place marker
+- Search for address using autocomplete and place marker
 - Drag marker around
 - Set default bounding box & zoom level on Data Type settings
+- Marker position is saved on the property to use the same on your website
 - Zoom level is saved on the property to use the same on your website
 - Bounding box is saved on the property to use the same on your website
 - Set the marker on specific coordinates
+- Set the zoom level
+
+## Raster layer map features
+- Click on exact location on map to place image
+- Drag image around
+- Stretch image with dots
+- Select default image on Data Type settings
+- Image position is saved on the property to use the same on your website
+- Image url is saved on the property to use the same on your website
+- Zoom level is saved on the property to use the same on your website
+- Bounding box is saved on the property to use the same on your website
+- Set the image on specific coordinates
+- Set the zoom level
+
+## Configuration
+You can configure the Access Token in AppSettings as per below.  
+Add the following to your appsettings.json file or equivalent settings provider (Azure KeyVault, Environment, etc.):
+
+```json
+  "MapboxConfig": {
+    "AccessToken": ""
+  }
+```
 
 ## Test site
-A test side is included with basic content saved in a SqlCe db (for v9) and SqLite (for v10 + v11). 
+A test side is included with basic content saved in a SqLite (for v10 + v11). 
 
-### Authentication
-**Username**: me@mail.com
+### Demo site Umbraco Backoffice Login Details
+
+**Username**: me@mail.com  
 **Password**: 1234567890
-
-## Versioning and push to nuget
-Make a git-tag with this format `release/x.x.x`. The pipeline with pick it up and release to nuget and create github release.
-
-## Contributions
-Thanks for the contributions
-- [Bjarke Berg](https://github.com/bergmania) (Initial creator)
-- [Bjarne Fyrstenborg](https://github.com/bjarnef)
-- [Arjan](https://github.com/creativesuspects)
-- [Yevhen Duyun](https://github.com/duyun-yevhen)
+  
