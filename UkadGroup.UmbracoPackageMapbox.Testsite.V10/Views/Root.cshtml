@@ -6,8 +6,19 @@
 }
 
 <h2>Test map</h2>
-<p>@Model.TestMap.MapboxRendering()</p>
+<p>@Model.TestMap.RenderMarkerMap()</p>
 <p><b>Zoom:</b> @Model.TestMap?.Zoom</p>
 <p><b>Marker:</b> @Model.TestMap?.Marker?.Latitude, @Model.TestMap?.Marker?.Longitude</p>
 <p><b>Bounding box:</b> @Model.TestMap?.BoundingBox.SouthWestCorner.Longitude, @Model.TestMap?.BoundingBox.SouthWestCorner.Latitude, @Model.TestMap?.BoundingBox.NorthEastCorner.Longitude, @Model.TestMap?.BoundingBox.NorthEastCorner.Latitude</p>
+
+<h2>Test map 2</h2>
+<p>@Model.TestMap2.RenderRasterLayerMap()</p>
+<p><b>Zoom:</b> @Model.TestMap2?.Zoom</p>
+<p><b>Image:</b> @Model.TestMap2?.Image</p>
+<p><b>Top left point:</b> @Model.TestMap2?.TopLeftPoint?.Latitude, @Model.TestMap2?.TopLeftPoint?.Longitude</p>
+<p><b>Top right point:</b> @Model.TestMap2?.TopRightPoint?.Latitude, @Model.TestMap2?.TopRightPoint?.Longitude</p>
+<p><b>Bottom left point:</b> @Model.TestMap2?.BottomLeftPoint?.Latitude, @Model.TestMap2?.BottomLeftPoint?.Longitude</p>
+<p><b>Bottom right point:</b> @Model.TestMap2?.BottomRightPoint?.Latitude, @Model.TestMap2?.BottomRightPoint?.Longitude</p>
+<p><b>Bounding box:</b> @Model.TestMap2?.BoundingBox.SouthWestCorner.Longitude, @Model.TestMap2?.BoundingBox.SouthWestCorner.Latitude, @Model.TestMap2?.BoundingBox.NorthEastCorner.Longitude, @Model.TestMap2?.BoundingBox.NorthEastCorner.Latitude</p>
+
 @Html.MapboxScripts()
