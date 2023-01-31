@@ -45,6 +45,7 @@
             vm.showLoader = true;
             vm.error = "";
             vm.image = "";
+            vm.imageAspectRatio = null;
 
             vm.dots = {
                 topLeft: [],
@@ -160,7 +161,6 @@
                     const canvas = vm.map.getCanvasContainer();
 
                     const sizeMultiplier = 0.15;
-                    let imageAspectRatio;
 
                     const mapContainer = document.getElementById(vm.mapId);
                     let containerSize = {
@@ -174,7 +174,7 @@
 
                     const img = new Image();
                     img.onload = function () {
-                        imageAspectRatio = this.width / this.height;
+                        vm.imageAspectRatio = this.width / this.height;
                     };
                     img.src = vm.image;
 
@@ -371,8 +371,12 @@
                             return;
                         }
 
+                        if (!vm.image) {
+                            return;
+                        }
+
                         const imageWidth = containerSize.width * sizeMultiplier;
-                        const imageHeight = imageWidth / imageAspectRatio;
+                        const imageHeight = imageWidth / vm.imageAspectRatio;
 
                         const center = e.point;
                         const canvasDots = {
@@ -417,8 +421,11 @@
                     vm.map.on("moveend", updateModel);
                     vm.map.on("zoomend", updateModel);
 
+                    if (vm.image) {
+                        drawImage();
+                    }
+
                     if (
-                        vm.image &&
                         vm.dots.topLeft[0] &&
                         vm.dots.topLeft[1] &&
                         vm.dots.topRight[0] &&
@@ -428,7 +435,6 @@
                         vm.dots.bottomRight[0] &&
                         vm.dots.bottomRight[1]
                     ) {
-                        drawImage();
                         drawDots();
                     }
 
@@ -514,6 +520,13 @@
                     submit: function (data) {
                         processSelection(data.selection[0].image);
                         editorService.close();
+
+                        const img = new Image();
+                        img.onload = function () {
+                            vm.imageAspectRatio = this.width / this.height;
+                        };
+                        img.src = vm.image;
+
                         updateModel();
                     },
                 });
