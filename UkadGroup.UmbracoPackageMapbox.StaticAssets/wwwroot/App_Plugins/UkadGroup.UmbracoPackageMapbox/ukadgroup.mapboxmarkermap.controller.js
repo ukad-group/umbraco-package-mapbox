@@ -21,10 +21,10 @@
             vm.clearMarker = clearMarker;
             vm.setZoom = setZoom;
 
-            vm.inputId = "osm_search_" + String.CreateGuid();
-            vm.inputLatId = "osm_Lat_" + String.CreateGuid();
-            vm.inputLngId = "osm_Lng_" + String.CreateGuid();
-            vm.inputZoomId = "osm_Zoom_" + String.CreateGuid();
+            vm.inputId = "search_" + String.CreateGuid();
+            vm.inputLatId = "marker_Lat_" + String.CreateGuid();
+            vm.inputLngId = "marker_Lng_" + String.CreateGuid();
+            vm.inputZoomId = "zoom_" + String.CreateGuid();
             vm.mapId = "map_" + String.CreateGuid();
             vm.coordinatesId = "coordinates_" + String.CreateGuid();
 

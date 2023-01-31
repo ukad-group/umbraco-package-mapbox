@@ -25,17 +25,17 @@
             vm.selectImage = selectImage;
             vm.removeImage = removeImage;
 
-            vm.topLeftInputLatId = "tl_Lat_" + String.CreateGuid();
-            vm.topLeftInputLngId = "tl_Lng_" + String.CreateGuid();
+            vm.topLeftInputLatId = "topleft_Lat_" + String.CreateGuid();
+            vm.topLeftInputLngId = "topleft_Lng_" + String.CreateGuid();
 
-            vm.topRightInputLatId = "tr_Lat_" + String.CreateGuid();
-            vm.topRightInputLngId = "tr_Lng_" + String.CreateGuid();
+            vm.topRightInputLatId = "topright_Lat_" + String.CreateGuid();
+            vm.topRightInputLngId = "topright_Lng_" + String.CreateGuid();
 
-            vm.bottomLeftInputLatId = "bl_Lat_" + String.CreateGuid();
-            vm.bottomLeftInputLngId = "bl_Lng_" + String.CreateGuid();
+            vm.bottomLeftInputLatId = "bottomleft_Lat_" + String.CreateGuid();
+            vm.bottomLeftInputLngId = "bottomleft_Lng_" + String.CreateGuid();
 
-            vm.bottomRightInputLatId = "br_Lat_" + String.CreateGuid();
-            vm.bottomRightInputLngId = "br_Lng_" + String.CreateGuid();
+            vm.bottomRightInputLatId = "bottomright_Lat_" + String.CreateGuid();
+            vm.bottomRightInputLngId = "bottomright_Lng_" + String.CreateGuid();
 
             vm.inputZoomId = "zoom_" + String.CreateGuid();
             vm.mapId = "map_" + String.CreateGuid();
@@ -81,7 +81,6 @@
 
             async function initMapboxMap() {
                 const defaultValue = {
-                    marker: { latitude: -54.975556, longitude: -1.621667 },
                     boundingBox: {
                         southWestCorner: {
                             latitude: -54.970495269313204,
@@ -146,16 +145,18 @@
                     vm.inputZoom = initValue.zoom;
                 }
 
-                // vm.map.on("contextmenu", function () {
-                //     if (
-                //         vm.allowClear !== true &&
-                //         Object.toBoolean($scope.model.config.allowClear) !==
-                //             true
-                //     ) {
-                //         return;
-                //     }
-                //     clearPoints();
-                // });
+                vm.map.on("contextmenu", function () {
+                    if (
+                        vm.allowClear !== true &&
+                        Object.toBoolean($scope.model.config.allowClear) !==
+                            true
+                    ) {
+                        return;
+                    }
+
+                    //TODO clear points
+                    //clearPoints();
+                });
 
                 vm.map.on("load", () => {
                     const canvas = vm.map.getCanvasContainer();
@@ -421,11 +422,8 @@
                     vm.map.on("moveend", updateModel);
                     vm.map.on("zoomend", updateModel);
 
-                    if (vm.image) {
-                        drawImage();
-                    }
-
                     if (
+                        vm.image &&
                         vm.dots.topLeft[0] &&
                         vm.dots.topLeft[1] &&
                         vm.dots.topRight[0] &&
@@ -435,6 +433,7 @@
                         vm.dots.bottomRight[0] &&
                         vm.dots.bottomRight[1]
                     ) {
+                        drawImage();
                         drawDots();
                     }
 
@@ -518,6 +517,7 @@
                         editorService.close();
                     },
                     submit: function (data) {
+                        removeImage();
                         processSelection(data.selection[0].image);
                         editorService.close();
 
@@ -584,22 +584,12 @@
             }
 
             function updatePoints() {
+                //TODO update points
                 // if (
                 //     !Number.isFinite(vm.inputLat) ||
                 //     !Number.isFinite(vm.inputLng)
                 // ) {
                 //     return;
-                // }
-
-                // // const lngLat = [vm.inputLng, vm.inputLat];
-                // // vm.map.jumpTo({
-                // //     center: lngLat,
-                // // });
-                // vm.currentMarker = new mapboxgl.Marker({ draggable: true })
-                //     .setLngLat(lngLat)
-                //     .addTo(vm.map);
-                // if (vm.currentMarker) {
-                //     vm.currentMarker.on("dragend", updateModel);
                 // }
 
                 updateModel();

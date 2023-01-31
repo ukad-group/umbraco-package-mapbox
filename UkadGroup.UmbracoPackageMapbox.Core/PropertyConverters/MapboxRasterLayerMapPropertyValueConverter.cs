@@ -29,7 +29,6 @@ namespace UkadGroup.UmbracoPackageMapbox.Core.PropertyConverters
             var configuration = propertyType.DataType.ConfigurationAs<MapboxRasterLayerMapConfiguration>();
 
             var model = string.IsNullOrWhiteSpace(inter?.ToString()) ? new MapboxRasterLayerMapModel() : _jsonSerializer.Deserialize<MapboxRasterLayerMapModel>(inter.ToString());
-            //configuration.DefaultPosition
 
             model.Configuration = configuration;
             model.Configuration.AccessToken = _mapboxConfig.AccessToken;
