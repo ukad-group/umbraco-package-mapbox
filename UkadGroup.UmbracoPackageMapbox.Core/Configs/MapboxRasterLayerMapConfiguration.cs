@@ -1,12 +1,10 @@
 ﻿using System.Runtime.Serialization;
-using UkadGroup.UmbracoPackageMapbox.Core.Models;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 
 namespace UkadGroup.UmbracoPackageMapbox.Core.Configs
 {
-    public class MapboxRasterLayerMapConfiguration
+	[DataContract]
+	public class MapboxRasterLayerMapConfiguration
     {
         [DataMember(Name = "accessToken")]
         public string AccessToken { get; set; }
