@@ -648,7 +648,7 @@
             }
 
             function updateDotsModel() {
-                if (vm.dots.topLeft) {
+                if (vm.dots.topLeft && vm.dots.topLeft[0] && vm.dots.topLeft[1]) {
                     const point = {
                         lng: vm.dots.topLeft[0],
                         lat: vm.dots.topLeft[1],
@@ -668,7 +668,7 @@
                     vm.topLeftInputLng = null;
                 }
 
-                if (vm.dots.topRight) {
+                if (vm.dots.topRight && vm.dots.topRight[0] && vm.dots.topRight[1]) {
                     const point = {
                         lng: vm.dots.topRight[0],
                         lat: vm.dots.topRight[1],
@@ -683,12 +683,12 @@
                     vm.topRightInputLat = point.lat;
                     vm.topRightInputLng = point.lng;
                 } else {
-                    $scope.model.value.topLeftPoint = null;
+                    $scope.model.value.topRightPoint = null;
                     vm.topRightInputLat = null;
                     vm.topRightInputLng = null;
                 }
 
-                if (vm.dots.bottomLeft) {
+                if (vm.dots.bottomLeft && vm.dots.bottomLeft[0] && vm.dots.bottomLeft[1]) {
                     const point = {
                         lng: vm.dots.bottomLeft[0],
                         lat: vm.dots.bottomLeft[1],
@@ -708,7 +708,7 @@
                     vm.bottomLeftInputLng = null;
                 }
 
-                if (vm.dots.bottomRight) {
+                if (vm.dots.bottomRight && vm.dots.bottomRight[0] && vm.dots.bottomRight[1]) {
                     const point = {
                         lng: vm.dots.bottomRight[0],
                         lat: vm.dots.bottomRight[1],
