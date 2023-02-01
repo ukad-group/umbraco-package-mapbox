@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace UkadGroup.UmbracoPackageMapbox.Testsite;
+namespace Ukad.UmbracoPackageMapbox.Testsite;
 
 public class Program
 {

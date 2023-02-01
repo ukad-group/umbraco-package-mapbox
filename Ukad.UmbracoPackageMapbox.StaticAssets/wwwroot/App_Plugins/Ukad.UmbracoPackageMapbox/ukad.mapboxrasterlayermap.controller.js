@@ -1,6 +1,6 @@
 ﻿angular
     .module("umbraco")
-    .controller("UkadGroup.UmbracoPackageMapbox.RasterLayerMap.Controller", [
+    .controller("Ukad.UmbracoPackageMapbox.RasterLayerMap.Controller", [
         "$scope",
         "$element",
         "$timeout",

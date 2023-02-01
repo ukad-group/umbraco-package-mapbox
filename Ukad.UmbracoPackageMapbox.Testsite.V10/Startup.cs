@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace UkadGroup.UmbracoPackageMapbox.Testsite;
+namespace Ukad.UmbracoPackageMapbox.Testsite;
 
 public class Startup
 {

@@ -1,8 +1,8 @@
 using System.Runtime.Serialization;
-using UkadGroup.UmbracoPackageMapbox.Core.Models;
+using Ukad.UmbracoPackageMapbox.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 
-namespace UkadGroup.UmbracoPackageMapbox.Core.Configs
+namespace Ukad.UmbracoPackageMapbox.Core.Configs
 {
     [DataContract]
     public class MapboxMarkerMapConfiguration

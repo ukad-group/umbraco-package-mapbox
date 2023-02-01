@@ -2,9 +2,9 @@
 using System.IO;
 using System.Runtime.Serialization;
 using System.Text.Encodings.Web;
-using UkadGroup.UmbracoPackageMapbox.Core.Configs;
+using Ukad.UmbracoPackageMapbox.Core.Configs;
 
-namespace UkadGroup.UmbracoPackageMapbox.Core.Models
+namespace Ukad.UmbracoPackageMapbox.Core.Models
 {
     [DataContract]
     public class MapboxRasterLayerMapModel : IHtmlContent

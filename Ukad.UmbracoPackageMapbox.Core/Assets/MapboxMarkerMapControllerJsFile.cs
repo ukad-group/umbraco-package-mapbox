@@ -1,11 +1,11 @@
 ﻿using Umbraco.Cms.Core.WebAssets;
 
-namespace UkadGroup.UmbracoPackageMapbox.Core.Assets
+namespace Ukad.UmbracoPackageMapbox.Core.Assets
 {
     internal class MapboxMarkerMapControllerJsFile : JavaScriptFile
     {
         public MapboxMarkerMapControllerJsFile()
-            : base("/App_Plugins/UkadGroup.UmbracoPackageMapbox/ukadgroup.mapboxmarkermap.controller.js")
+            : base("/App_Plugins/Ukad.UmbracoPackageMapbox/ukad.mapboxmarkermap.controller.js")
         { }
     }
 }

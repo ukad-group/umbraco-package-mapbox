@@ -1,10 +1,10 @@
-﻿using UkadGroup.UmbracoPackageMapbox.Core.Configs;
+﻿using Ukad.UmbracoPackageMapbox.Core.Configs;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 
-namespace UkadGroup.UmbracoPackageMapbox.Core.PropertyEditors
+namespace Ukad.UmbracoPackageMapbox.Core.PropertyEditors
 {
 
     /// <summary>

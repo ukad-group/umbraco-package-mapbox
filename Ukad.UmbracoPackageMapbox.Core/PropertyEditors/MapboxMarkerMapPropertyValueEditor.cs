@@ -1,11 +1,11 @@
-﻿using UkadGroup.UmbracoPackageMapbox.Core.Validators;
+﻿using Ukad.UmbracoPackageMapbox.Core.Validators;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 
-namespace UkadGroup.UmbracoPackageMapbox.Core.PropertyEditors
+namespace Ukad.UmbracoPackageMapbox.Core.PropertyEditors
 {
     public class MapboxMarkerMapPropertyValueEditor : DataValueEditor
     {

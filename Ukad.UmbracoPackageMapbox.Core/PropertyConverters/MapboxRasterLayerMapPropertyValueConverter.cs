@@ -1,11 +1,11 @@
 ﻿using System;
-using UkadGroup.UmbracoPackageMapbox.Core.Configs;
-using UkadGroup.UmbracoPackageMapbox.Core.Models;
+using Ukad.UmbracoPackageMapbox.Core.Configs;
+using Ukad.UmbracoPackageMapbox.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 
-namespace UkadGroup.UmbracoPackageMapbox.Core.PropertyConverters
+namespace Ukad.UmbracoPackageMapbox.Core.PropertyConverters
 {
     public class MapboxRasterLayerMapPropertyValueConverter : PropertyValueConverterBase
     {

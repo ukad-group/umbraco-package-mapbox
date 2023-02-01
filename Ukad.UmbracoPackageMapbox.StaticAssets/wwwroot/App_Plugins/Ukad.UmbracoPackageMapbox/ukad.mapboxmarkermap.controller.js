@@ -1,6 +1,6 @@
 ﻿angular
     .module("umbraco")
-    .controller("UkadGroup.UmbracoPackageMapbox.MarkerMap.Controller", [
+    .controller("Ukad.UmbracoPackageMapbox.MarkerMap.Controller", [
         "$scope",
         "$element",
         "$timeout",

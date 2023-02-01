@@ -1,7 +1,7 @@
 ﻿using System.Runtime.Serialization;
 using Umbraco.Cms.Core.PropertyEditors;
 
-namespace UkadGroup.UmbracoPackageMapbox.Core.Configs
+namespace Ukad.UmbracoPackageMapbox.Core.Configs
 {
 	[DataContract]
 	public class MapboxRasterLayerMapConfiguration

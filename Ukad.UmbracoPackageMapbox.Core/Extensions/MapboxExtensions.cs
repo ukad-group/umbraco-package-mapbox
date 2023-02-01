@@ -1,10 +1,10 @@
 ﻿using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
-using UkadGroup.UmbracoPackageMapbox.Core.Models;
+using Ukad.UmbracoPackageMapbox.Core.Models;
 
 // ReSharper disable once CheckNamespace
-namespace UkadGroup.UmbracoPackageMapbox.Core.Extensions
+namespace Ukad.UmbracoPackageMapbox.Core.Extensions
 {
     public static class MapboxExtensions
     {

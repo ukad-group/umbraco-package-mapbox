@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace UkadGroup.UmbracoPackageMapbox.Core.Models
+namespace Ukad.UmbracoPackageMapbox.Core.Models
 {
     [DataContract]
     public class BoundingBoxModel

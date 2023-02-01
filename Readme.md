@@ -1,4 +1,4 @@
-# UkadGroup.UmbracoPackageMapbox
+# Ukad.UmbracoPackageMapbox
 Mapbox property editors for Umbraco 9+.  
 Allows to create new datatypes of types "Mapbox Marker Map" and "Mapbox Raster Layer Map".
 

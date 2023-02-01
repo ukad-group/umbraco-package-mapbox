@@ -2,7 +2,7 @@
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 
-namespace UkadGroup.UmbracoPackageMapbox.Core.Configs
+namespace Ukad.UmbracoPackageMapbox.Core.Configs
 {
     public class MapboxRasterLayerMapConfigurationEditor : ConfigurationEditor<MapboxRasterLayerMapConfiguration>
     {

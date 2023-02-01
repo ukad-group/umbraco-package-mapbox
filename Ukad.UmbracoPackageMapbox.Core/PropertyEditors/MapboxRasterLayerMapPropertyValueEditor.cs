@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 
-namespace UkadGroup.UmbracoPackageMapbox.Core.PropertyEditors
+namespace Ukad.UmbracoPackageMapbox.Core.PropertyEditors
 {
     public class MapboxRasterLayerMapPropertyValueEditor : DataValueEditor
     {

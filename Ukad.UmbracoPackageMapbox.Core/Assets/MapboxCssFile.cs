@@ -1,11 +1,11 @@
 ﻿using Umbraco.Cms.Core.WebAssets;
 
-namespace UkadGroup.UmbracoPackageMapbox.Core.Assets
+namespace Ukad.UmbracoPackageMapbox.Core.Assets
 {
     internal class MapboxCssFile : CssFile
     {
         public MapboxCssFile()
-            : base("/App_Plugins/UkadGroup.UmbracoPackageMapbox/lib/mapbox/mapbox.css")
+            : base("/App_Plugins/Ukad.UmbracoPackageMapbox/lib/mapbox/mapbox.css")
         { }
     }
 }

@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using System.Runtime.Serialization;
 
-namespace UkadGroup.UmbracoPackageMapbox.Core.Configs
+namespace Ukad.UmbracoPackageMapbox.Core.Configs
 {
     public class MapboxConfig
     {

@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Attributes;
-using UkadGroup.UmbracoPackageMapbox.Core.Configs;
+using Ukad.UmbracoPackageMapbox.Core.Configs;
 
-namespace UkadGroup.UmbracoPackageMapbox.Core.Controllers
+namespace Ukad.UmbracoPackageMapbox.Core.Controllers
 {
     [PluginController(Constants.PluginName)]
     public class MapboxController : UmbracoApiController

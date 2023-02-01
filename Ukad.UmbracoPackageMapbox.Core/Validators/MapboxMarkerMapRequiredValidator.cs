@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using UkadGroup.UmbracoPackageMapbox.Core.Models;
+using Ukad.UmbracoPackageMapbox.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
 
-namespace UkadGroup.UmbracoPackageMapbox.Core.Validators
+namespace Ukad.UmbracoPackageMapbox.Core.Validators
 {
     public class MapboxMarkerMapRequiredValidator : IValueRequiredValidator
     {

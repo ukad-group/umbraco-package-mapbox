@@ -7,7 +7,7 @@ using System;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Extensions;
 
-namespace UkadGroup.UmbracoPackageMapbox.Testsite
+namespace Ukad.UmbracoPackageMapbox.Testsite
 {
     public class Startup
     {

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using UkadGroup.UmbracoPackageMapbox.Core.Configs;
+using Ukad.UmbracoPackageMapbox.Core.Configs;
 using Umbraco.Cms.Core.DependencyInjection;
 
-namespace UkadGroup.UmbracoPackageMapbox.Core.Extensions
+namespace Ukad.UmbracoPackageMapbox.Core.Extensions
 {
     public static class MapboxBuilderExtensions
     {
