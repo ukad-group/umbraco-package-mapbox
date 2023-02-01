@@ -5,10 +5,10 @@ namespace Ukad.UmbracoPackageMapbox.Core.Models
     [DataContract]
     public class LatitudeLongitudeModel
     {
-        [DataMember(Name = "latitude")]
+        [DataMember(Name = "latitude", IsRequired = true)]
         public decimal Latitude { get; set; }
 
-        [DataMember(Name = "longitude")]
+        [DataMember(Name = "longitude", IsRequired = true)]
         public decimal Longitude { get; set; }
     }
 }
