@@ -3,7 +3,7 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <Description>Umbraco extension containing a Map property editor using Mapbox</Description>
         <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
-        <Title>UkadGroup.UmbracoPackageMapbox</Title>
+        <Title>Ukad.UmbracoPackageMapbox</Title>
         <PackageIcon>icon-128.png</PackageIcon>
         <ContentTargetFolders>.</ContentTargetFolders>
         <PackageTags>umbraco plugin package mapbox umbraco-marketplace</PackageTags>
@@ -15,7 +15,7 @@
         <None Include="README.md" Pack="true" PackagePath="\" />
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\UkadGroup.UmbracoPackageMapbox.Core\UkadGroup.UmbracoPackageMapbox.Core.csproj" />
-      <ProjectReference Include="..\UkadGroup.UmbracoPackageMapbox.StaticAssets\UkadGroup.UmbracoPackageMapbox.StaticAssets.csproj" />
+      <ProjectReference Include="..\Ukad.UmbracoPackageMapbox.Core\Ukad.UmbracoPackageMapbox.Core.csproj" />
+      <ProjectReference Include="..\Ukad.UmbracoPackageMapbox.StaticAssets\Ukad.UmbracoPackageMapbox.StaticAssets.csproj" />
     </ItemGroup>
 </Project>

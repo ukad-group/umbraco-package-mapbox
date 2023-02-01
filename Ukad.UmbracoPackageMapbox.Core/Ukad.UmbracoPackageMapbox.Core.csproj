@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
-        <Title>UkadGroup.UmbracoPackageMapbox.Core</Title>
+        <Title>Ukad.UmbracoPackageMapbox.Core</Title>
         <PackageIcon>icon-128.png</PackageIcon>
     </PropertyGroup>
 

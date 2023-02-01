@@ -34,17 +34,17 @@ bld/
 # Visual Studio 2015/2017 cache/options directory
 .vs/
 
-/UkadGroup.UmbracoPackageMapbox.Testsite/App_Plugins/
-/UkadGroup.UmbracoPackageMapbox.Testsite/umbraco/Logs
-/UkadGroup.UmbracoPackageMapbox.Testsite/umbraco/Data/TEMP
-/UkadGroup.UmbracoPackageMapbox.Testsite/umbraco/Data/packages
-/UkadGroup.UmbracoPackageMapbox.Testsite/wwwroot/umbraco/
-/UkadGroup.UmbracoPackageMapbox.Testsite/umbraco/PartialViewMacros/
-/UkadGroup.UmbracoPackageMapbox.Testsite/umbraco/UmbracoBackOffice/
-/UkadGroup.UmbracoPackageMapbox.Testsite/umbraco/UmbracoInstall/
-/UkadGroup.UmbracoPackageMapbox.Testsite/umbraco/UmbracoWebsite/
-/UkadGroup.UmbracoPackageMapbox.Testsite/umbraco/config/
-/UkadGroup.UmbracoPackageMapbox.Testsite/Smidge/
-/UkadGroup.UmbracoPackageMapbox.Testsite.V1*/appsettings-schema*.json
-/UkadGroup.UmbracoPackageMapbox.Testsite.V1*/umbraco/
+/Ukad.UmbracoPackageMapbox.Testsite/App_Plugins/
+/Ukad.UmbracoPackageMapbox.Testsite/umbraco/Logs
+/Ukad.UmbracoPackageMapbox.Testsite/umbraco/Data/TEMP
+/Ukad.UmbracoPackageMapbox.Testsite/umbraco/Data/packages
+/Ukad.UmbracoPackageMapbox.Testsite/wwwroot/umbraco/
+/Ukad.UmbracoPackageMapbox.Testsite/umbraco/PartialViewMacros/
+/Ukad.UmbracoPackageMapbox.Testsite/umbraco/UmbracoBackOffice/
+/Ukad.UmbracoPackageMapbox.Testsite/umbraco/UmbracoInstall/
+/Ukad.UmbracoPackageMapbox.Testsite/umbraco/UmbracoWebsite/
+/Ukad.UmbracoPackageMapbox.Testsite/umbraco/config/
+/Ukad.UmbracoPackageMapbox.Testsite/Smidge/
+/Ukad.UmbracoPackageMapbox.Testsite.V1*/appsettings-schema*.json
+/Ukad.UmbracoPackageMapbox.Testsite.V1*/umbraco/
 
