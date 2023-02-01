@@ -1,0 +1,50 @@
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# User-specific files (MonoDevelop/Xamarin Studio)
+*.userprefs
+
+# Mono auto generated files
+mono_crash.*
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# Visual Studio 2015/2017 cache/options directory
+.vs/
+
+/Ukad.UmbracoPackageMapbox.Testsite/App_Plugins/
+/Ukad.UmbracoPackageMapbox.Testsite/umbraco/Logs
+/Ukad.UmbracoPackageMapbox.Testsite/umbraco/Data/TEMP
+/Ukad.UmbracoPackageMapbox.Testsite/umbraco/Data/packages
+/Ukad.UmbracoPackageMapbox.Testsite/wwwroot/umbraco/
+/Ukad.UmbracoPackageMapbox.Testsite/umbraco/PartialViewMacros/
+/Ukad.UmbracoPackageMapbox.Testsite/umbraco/UmbracoBackOffice/
+/Ukad.UmbracoPackageMapbox.Testsite/umbraco/UmbracoInstall/
+/Ukad.UmbracoPackageMapbox.Testsite/umbraco/UmbracoWebsite/
+/Ukad.UmbracoPackageMapbox.Testsite/umbraco/config/
+/Ukad.UmbracoPackageMapbox.Testsite/Smidge/
+/Ukad.UmbracoPackageMapbox.Testsite.V1*/appsettings-schema*.json
+/Ukad.UmbracoPackageMapbox.Testsite.V1*/umbraco/
+

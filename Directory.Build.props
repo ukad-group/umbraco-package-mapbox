@@ -1,0 +1,14 @@
+<Project>
+	<PropertyGroup>
+		<Product>Ukad.UmbracoPackageMapbox</Product>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<RepositoryUrl>https://github.com/ukad-group/umbraco-package-mapbox</RepositoryUrl>
+		<PackageProjectUrl>https://github.com/ukad-group/umbraco-package-mapbox/</PackageProjectUrl>
+		<AssemblyVersion>1.0.0</AssemblyVersion>
+		<Version>1.0.0</Version>
+		<InformationalVersion>1.0.0</InformationalVersion>
+		<Authors>Ukad</Authors>
+	</PropertyGroup>
+	
+
+</Project>
