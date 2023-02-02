@@ -84,9 +84,18 @@
                     $scope.model.config.defaultPosition ||
                     defaultValue;
 
+                isBoundingBoxExists =
+                    initValue?.boundingBox?.southWestCorner?.longitude &&
+                    initValue?.boundingBox?.southWestCorner?.latitude &&
+                    initValue?.boundingBox?.northEastCorner?.longitude &&
+                    initValue?.boundingBox?.northEastCorner?.latitude;
+
+                isMarkerExists =
+                    initValue.marker?.latitude && initValue.marker?.longitude;
+
                 vm.coordinatesBox = document.getElementById(vm.coordinatesId);
 
-                if (initValue.marker?.latitude && initValue.marker?.longitude) {
+                if (isMarkerExists) {
                     vm.coordinatesBox.style.display = "block";
                     vm.coordinatesBox.innerHTML = `Longitude: ${initValue.marker.longitude}<br />Latitude: ${initValue.marker.latitude}`;
                 }
@@ -101,32 +110,41 @@
                     vm.showLoader = false;
                 }
 
-                const southWest = new mapboxgl.LngLat(
-                    initValue.boundingBox.southWestCorner.longitude,
-                    initValue.boundingBox.southWestCorner.latitude
-                );
-                const northEast = new mapboxgl.LngLat(
-                    initValue.boundingBox.northEastCorner.longitude,
-                    initValue.boundingBox.northEastCorner.latitude
-                );
-                const boundingBox = new mapboxgl.LngLatBounds(
-                    southWest,
-                    northEast
-                );
-
                 vm.map = new mapboxgl.Map({
                     accessToken: vm.accessToken,
                     container: vm.mapId,
                     animate: false,
                     style: "mapbox://styles/mapbox/streets-v12",
-                    center: [
-                        initValue.marker?.longitude ??
-                            boundingBox.getCenter().lng,
-                        initValue.marker?.latitude ??
-                            boundingBox.getCenter().lat,
-                    ],
                     zoom: initValue.zoom,
-                }).fitBounds(boundingBox);
+                });
+
+                if (isMarkerExists) {
+                    vm.map.jumpTo({
+                        center: [
+                            initValue.marker?.longitude,
+                            initValue.marker?.latitude,
+                        ],
+                    });
+                } else if (isBoundingBoxExists) {
+                    const boundingBox = getBoundingBox(initValue);
+                    vm.map.jumpTo({
+                        center: [
+                            boundingBox.getCenter().lng,
+                            boundingBox.getCenter().lat,
+                        ],
+                    });
+                } else {
+                    vm.map.jumpTo({
+                        center: [
+                            defaultValue.marker.longitude,
+                            defaultValue.marker.latitude,
+                        ],
+                    });
+                }
+
+                if (isBoundingBoxExists) {
+                    vm.map.fitBounds(getBoundingBox(initValue));
+                }
 
                 vm.map.addControl(new mapboxgl.NavigationControl());
                 vm.map.dragRotate.disable();
@@ -154,7 +172,7 @@
                     clearMarker();
                 });
 
-                if (initValue.marker) {
+                if (isMarkerExists) {
                     vm.currentMarker = new mapboxgl.Marker({ draggable: true })
                         .setLngLat([
                             initValue.marker.longitude,
@@ -181,7 +199,6 @@
 
                 vm.map.on("load", (e) => {
                     vm.map.resize();
-                    vm.map.fitBounds(boundingBox);
                     vm.map.setZoom(initValue.zoom);
                 });
 
@@ -193,6 +210,22 @@
                     vm.map.resize();
                     vm.map.setZoom(vm.map.getZoom());
                 });
+            }
+
+            function getBoundingBox(initValue) {
+                const southWest = new mapboxgl.LngLat(
+                    initValue.boundingBox.southWestCorner.longitude,
+                    initValue.boundingBox.southWestCorner.latitude
+                );
+                const northEast = new mapboxgl.LngLat(
+                    initValue.boundingBox.northEastCorner.longitude,
+                    initValue.boundingBox.northEastCorner.latitude
+                );
+
+                return (boundingBox = new mapboxgl.LngLatBounds(
+                    southWest,
+                    northEast
+                ));
             }
 
             function clearMarker(e, skipUpdate) {
