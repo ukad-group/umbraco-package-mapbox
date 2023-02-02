@@ -96,6 +96,25 @@
 
                 const initValue = $scope.model.value || defaultValue;
 
+                initImageWithPoints(initValue);
+
+                isBoundingBoxExists =
+                    initValue?.boundingBox?.southWestCorner?.longitude &&
+                    initValue?.boundingBox?.southWestCorner?.latitude &&
+                    initValue?.boundingBox?.northEastCorner?.longitude &&
+                    initValue?.boundingBox?.northEastCorner?.latitude;
+
+                isPlacedImageExists =
+                    vm.image &&
+                    vm.dots.topLeft[0] &&
+                    vm.dots.topLeft[1] &&
+                    vm.dots.topRight[0] &&
+                    vm.dots.topRight[1] &&
+                    vm.dots.bottomLeft[0] &&
+                    vm.dots.bottomLeft[1] &&
+                    vm.dots.bottomRight[0] &&
+                    vm.dots.bottomRight[1];
+
                 if (vm.accessToken === "") {
                     vm.error =
                         "No Mapbox access token set, Maps Editor cannot load.";
@@ -106,36 +125,23 @@
                     vm.showLoader = false;
                 }
 
-                const southWest = new mapboxgl.LngLat(
-                    initValue.boundingBox.southWestCorner.longitude,
-                    initValue.boundingBox.southWestCorner.latitude
-                );
-                const northEast = new mapboxgl.LngLat(
-                    initValue.boundingBox.northEastCorner.longitude,
-                    initValue.boundingBox.northEastCorner.latitude
-                );
-                const boundingBox = new mapboxgl.LngLatBounds(
-                    southWest,
-                    northEast
-                );
-
                 vm.map = new mapboxgl.Map({
                     accessToken: vm.accessToken,
                     container: vm.mapId,
                     animate: false,
                     style: "mapbox://styles/mapbox/streets-v12",
-                    center: [
-                        boundingBox.getCenter().lng,
-                        boundingBox.getCenter().lat,
-                    ],
                     zoom: initValue.zoom,
-                }).fitBounds(boundingBox);
+                });
+
+                vm.initBox = isBoundingBoxExists
+                    ? getBoundingBox(initValue)
+                    : getBoundingBox(defaultValue);
+
+                vm.map.fitBounds(vm.initBox);
 
                 vm.map.addControl(new mapboxgl.NavigationControl());
                 vm.map.dragRotate.disable();
                 vm.map.touchZoomRotate.disableRotation();
-
-                initImageWithPoints(initValue);
 
                 if (vm.scrollWheelZoom == false) {
                     vm.map.scrollZoom.disable();
@@ -422,23 +428,12 @@
                     vm.map.on("moveend", updateModel);
                     vm.map.on("zoomend", updateModel);
 
-                    if (
-                        vm.image &&
-                        vm.dots.topLeft[0] &&
-                        vm.dots.topLeft[1] &&
-                        vm.dots.topRight[0] &&
-                        vm.dots.topRight[1] &&
-                        vm.dots.bottomLeft[0] &&
-                        vm.dots.bottomLeft[1] &&
-                        vm.dots.bottomRight[0] &&
-                        vm.dots.bottomRight[1]
-                    ) {
+                    if (isPlacedImageExists) {
                         drawImage();
                         drawDots();
                     }
 
                     vm.map.resize();
-                    vm.map.fitBounds(boundingBox);
                     vm.map.setZoom(initValue.zoom);
                 });
 
@@ -446,6 +441,22 @@
                     vm.map.resize();
                     vm.map.setZoom(vm.map.getZoom());
                 });
+            }
+
+            function getBoundingBox(initValue) {
+                const southWest = new mapboxgl.LngLat(
+                    initValue.boundingBox.southWestCorner.longitude,
+                    initValue.boundingBox.southWestCorner.latitude
+                );
+                const northEast = new mapboxgl.LngLat(
+                    initValue.boundingBox.northEastCorner.longitude,
+                    initValue.boundingBox.northEastCorner.latitude
+                );
+
+                return (boundingBox = new mapboxgl.LngLatBounds(
+                    southWest,
+                    northEast
+                ));
             }
 
             function initImageWithPoints(initValue) {
@@ -585,12 +596,6 @@
 
             function updatePoints() {
                 //TODO update points
-                // if (
-                //     !Number.isFinite(vm.inputLat) ||
-                //     !Number.isFinite(vm.inputLng)
-                // ) {
-                //     return;
-                // }
 
                 updateModel();
             }
@@ -631,8 +636,25 @@
                         $scope.model.value.boundingBox.northEastCorner = {};
                     }
 
-                    const northEastCorner = vm.map.getBounds().getNorthEast();
-                    const southWestCorner = vm.map.getBounds().getSouthWest();
+                    //TODO fix initial shift
+
+                    let northEastCorner;
+                    let southWestCorner;
+
+                    if (vm.initBox) {
+                        northEastCorner = vm.initBox.getNorthEast();
+                        southWestCorner = vm.initBox.getSouthWest();
+
+                        vm.initBox = null;
+
+                        vm.map.fitBounds([
+                            [northEastCorner.lng, northEastCorner.lat],
+                            [southWestCorner.lng, southWestCorner.lat],
+                        ]);
+                    } else {
+                        northEastCorner = vm.map.getBounds().getNorthEast();
+                        southWestCorner = vm.map.getBounds().getSouthWest();
+                    }
 
                     $scope.model.value.boundingBox.northEastCorner.latitude =
                         northEastCorner.lat;
@@ -648,7 +670,11 @@
             }
 
             function updateDotsModel() {
-                if (vm.dots.topLeft && vm.dots.topLeft[0] && vm.dots.topLeft[1]) {
+                if (
+                    vm.dots.topLeft &&
+                    vm.dots.topLeft[0] &&
+                    vm.dots.topLeft[1]
+                ) {
                     const point = {
                         lng: vm.dots.topLeft[0],
                         lat: vm.dots.topLeft[1],
@@ -668,7 +694,11 @@
                     vm.topLeftInputLng = null;
                 }
 
-                if (vm.dots.topRight && vm.dots.topRight[0] && vm.dots.topRight[1]) {
+                if (
+                    vm.dots.topRight &&
+                    vm.dots.topRight[0] &&
+                    vm.dots.topRight[1]
+                ) {
                     const point = {
                         lng: vm.dots.topRight[0],
                         lat: vm.dots.topRight[1],
@@ -688,7 +718,11 @@
                     vm.topRightInputLng = null;
                 }
 
-                if (vm.dots.bottomLeft && vm.dots.bottomLeft[0] && vm.dots.bottomLeft[1]) {
+                if (
+                    vm.dots.bottomLeft &&
+                    vm.dots.bottomLeft[0] &&
+                    vm.dots.bottomLeft[1]
+                ) {
                     const point = {
                         lng: vm.dots.bottomLeft[0],
                         lat: vm.dots.bottomLeft[1],
@@ -708,7 +742,11 @@
                     vm.bottomLeftInputLng = null;
                 }
 
-                if (vm.dots.bottomRight && vm.dots.bottomRight[0] && vm.dots.bottomRight[1]) {
+                if (
+                    vm.dots.bottomRight &&
+                    vm.dots.bottomRight[0] &&
+                    vm.dots.bottomRight[1]
+                ) {
                     const point = {
                         lng: vm.dots.bottomRight[0],
                         lat: vm.dots.bottomRight[1],
