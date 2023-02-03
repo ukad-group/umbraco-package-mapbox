@@ -38,26 +38,20 @@ jobs:
       working-directory: Ukad.UmbracoPackageMapbox
       run: |
         version="$(cat package.json | grep version | awk -F ':' {'print $2'} | grep -o -P '(?<=").*(?=")')"
-        echo "VERSION=$version" >> $GITHUB_ENV
-        echo "VERSION_SUFFIX=${GITHUB_SHA::7}" >> $GITHUB_ENV
+        echo "VERSION=$version-${GITHUB_SHA::7}" >> $GITHUB_ENV
+        echo "VERSION=${{ env.VERSION }}"
     - name: Get current version main
       if: ${{ github.ref == 'refs/heads/main' }}
       working-directory: Ukad.UmbracoPackageMapbox
       run: |
         version="$(cat package.json | grep version | awk -F ':' {'print $2'} | grep -o -P '(?<=").*(?=")')"
         echo "VERSION=$version" >> $GITHUB_ENV
-        echo "VERSION_SUFFIX=''" >> $GITHUB_ENV
-        echo -e "Version: $VERSION\nVersion Suffix: $VERSION_SUFFIX"
-        sed -i "s/\$(VERSION)/$VERSION/g" Ukad.UmbracoPackageMapbox.Core/Ukad.UmbracoPackageMapbox.Core.csproj
-        sed -i "s/\$(VERSION_SUFFIX)/$VERSION_SUFFIX/g" Ukad.UmbracoPackageMapbox.Core/Ukad.UmbracoPackageMapbox.Core.csproj
+        echo "VERSION=${{ env.VERSION }}"
     - name: Restore dependencies
       run: dotnet restore 
-      working-directory: ${{ env.WORKDIR }}
     - name: Build
-      run: dotnet build Ukad.UmbracoPackageMapbox/Ukad.UmbracoPackageMapbox.csproj --configuration Release --no-restore
+      run: dotnet build Ukad.UmbracoPackageMapbox.Core/Ukad.UmbracoPackageMapbox.Core.csproj --configuration Release --no-restore
     - name: Pack
-      run: dotnet pack Ukad.UmbracoPackageMapbox/Ukad.UmbracoPackageMapbox.csproj --configuration Release --output artifacts --version-suffix "${{ env.VERSION }}"
-    - name: Run tmate
-      uses: mxschmitt/action-tmate@v2
+      run: dotnet pack Ukad.UmbracoPackageMapbox.Core/Ukad.UmbracoPackageMapbox.Core.csproj --configuration Release --output artifacts /p:Version=${{ env.VERSION }}
     - name: Push
-      run: dotnet nuget push artifacts/Ukad.UmbracoPackageMapbox.${{ env.VERSION }}.nupkg -k ${{ secrets.UKAD_NUGET_SRV_API_KEY }} -s https://nuget.ukad.dev/nuget/internal/ --no-symbols
+      run: dotnet nuget push artifacts/Ukad.UmbracoPackageMapbox.Core.${{ env.VERSION }}.nupkg -k ${{ secrets.UKAD_NUGET_SRV_API_KEY }} -s https://nuget.ukad.dev/nuget/internal/ --no-symbols
