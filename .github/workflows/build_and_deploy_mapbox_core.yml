@@ -38,13 +38,15 @@ jobs:
       working-directory: Ukad.UmbracoPackageMapbox
       run: |
         version="$(cat package.json | grep version | awk -F ':' {'print $2'} | grep -o -P '(?<=").*(?=")')"
-        echo "VERSION=$version-${GITHUB_SHA::7}" >> $GITHUB_ENV
+        echo "VERSION=$version" >> $GITHUB_ENV
+        echo "VERSION_SUFFIX=${GITHUB_SHA::7}"
     - name: Get current version main
       if: ${{ github.ref == 'refs/heads/main' }}
       working-directory: Ukad.UmbracoPackageMapbox
       run: |
         version="$(cat package.json | grep version | awk -F ':' {'print $2'} | grep -o -P '(?<=").*(?=")')"
         echo "VERSION=$version" >> $GITHUB_ENV
+        echo "VERSION_SUFFIX=''"
     - name: Restore dependencies
       run: dotnet restore 
       working-directory: ${{ env.WORKDIR }}
