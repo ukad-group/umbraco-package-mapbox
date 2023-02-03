@@ -9,7 +9,7 @@ jobs:
   bump-version:
     name: "Bump Version on main"
     runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' }}
+    if: ${{ github.ref == 'refs/heads/master' }}
     outputs:
       version: ${{ steps.version.outputs.newTag }}
     steps:
