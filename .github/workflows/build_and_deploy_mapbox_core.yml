@@ -36,14 +36,14 @@ jobs:
       with:
         dotnet-version: 7.0.x
     - name: Get current version dev
-      working-directory: Ukad.UmbracoPackageMapbox
+      working-directory: Ukad.UmbracoPackageMapbox.Core
       run: |
         version="$(cat package.json | grep version | awk -F ':' {'print $2'} | grep -o -P '(?<=").*(?=")')"
         echo "VERSION=$version-${GITHUB_SHA::7}" >> $GITHUB_ENV
         echo "VERSION=${{ env.VERSION }}"
     - name: Get current version main
       if: ${{ github.ref == 'refs/heads/main' }}
-      working-directory: Ukad.UmbracoPackageMapbox
+      working-directory: Ukad.UmbracoPackageMapbox.Core
       run: |
         version="$(cat package.json | grep version | awk -F ':' {'print $2'} | grep -o -P '(?<=").*(?=")')"
         echo "VERSION=$version" >> $GITHUB_ENV
