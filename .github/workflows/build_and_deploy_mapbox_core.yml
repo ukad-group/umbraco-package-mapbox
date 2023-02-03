@@ -24,7 +24,7 @@ jobs:
           tag-prefix: ''
         env:
           GITHUB_TOKEN: ${{ github.token }}
-          PACKAGEJSON_DIR: ${{ env.WORKDIR }}
+          PACKAGEJSON_DIR: Ukad.UmbracoPackageMapbox.Core
           
   build:
     runs-on: ubuntu-latest
