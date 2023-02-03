@@ -39,14 +39,17 @@ jobs:
       run: |
         version="$(cat package.json | grep version | awk -F ':' {'print $2'} | grep -o -P '(?<=").*(?=")')"
         echo "VERSION=$version" >> $GITHUB_ENV
-        echo "VERSION_SUFFIX=${GITHUB_SHA::7}"
+        echo "VERSION_SUFFIX=${GITHUB_SHA::7}" >> $GITHUB_ENV
     - name: Get current version main
       if: ${{ github.ref == 'refs/heads/main' }}
       working-directory: Ukad.UmbracoPackageMapbox
       run: |
         version="$(cat package.json | grep version | awk -F ':' {'print $2'} | grep -o -P '(?<=").*(?=")')"
         echo "VERSION=$version" >> $GITHUB_ENV
-        echo "VERSION_SUFFIX=''"
+        echo "VERSION_SUFFIX=''" >> $GITHUB_ENV
+        echo -e "Version: $VERSION\nVersion Suffix: $VERSION_SUFFIX"
+        sed -i "s/\$(VERSION)/$VERSION/g" Ukad.UmbracoPackageMapbox.Core/Ukad.UmbracoPackageMapbox.Core.csproj
+        sed -i "s/\$(VERSION_SUFFIX)/$VERSION_SUFFIX/g" Ukad.UmbracoPackageMapbox.Core/Ukad.UmbracoPackageMapbox.Core.csproj
     - name: Restore dependencies
       run: dotnet restore 
       working-directory: ${{ env.WORKDIR }}
