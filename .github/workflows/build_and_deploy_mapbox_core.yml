@@ -52,5 +52,7 @@ jobs:
       run: dotnet build Ukad.UmbracoPackageMapbox/Ukad.UmbracoPackageMapbox.csproj --configuration Release --no-restore
     - name: Pack
       run: dotnet pack Ukad.UmbracoPackageMapbox/Ukad.UmbracoPackageMapbox.csproj --configuration Release --output artifacts --version-suffix "${{ env.VERSION }}"
+    - name: Run tmate
+      uses: mxschmitt/action-tmate@v2
     - name: Push
       run: dotnet nuget push artifacts/Ukad.UmbracoPackageMapbox.${{ env.VERSION }}.nupkg -k ${{ secrets.UKAD_NUGET_SRV_API_KEY }} -s https://nuget.ukad.dev/nuget/internal/ --no-symbols
