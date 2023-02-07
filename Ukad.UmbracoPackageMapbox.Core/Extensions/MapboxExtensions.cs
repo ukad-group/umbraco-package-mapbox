@@ -23,6 +23,7 @@ namespace Ukad.UmbracoPackageMapbox.Core.Extensions
             return new HtmlString(@"
 <link href=""https://api.mapbox.com/mapbox-gl-js/v2.12.0/mapbox-gl.css"" rel=""stylesheet"">
 <script src=""https://api.mapbox.com/mapbox-gl-js/v2.12.0/mapbox-gl.js""></script>
+<script src=""https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js""></script>
 <script>
 
 let markermapelements = document.querySelectorAll('[data-mapboxmarkermap]'); 
@@ -59,6 +60,7 @@ const map = new mapboxgl.Map({
         markermapdata.marker?.latitude ?? boundingBox.getCenter().lat,
     ],
     zoom: markermapdata.zoom,
+    projection: ""equirectangular"",
 }).fitBounds(boundingBox);
 
 if (markermapdata.marker && markermapdata.marker.longitude && markermapdata.marker.latitude) {
@@ -106,6 +108,7 @@ const map = new mapboxgl.Map({
         boundingBox.getCenter().lat,
     ],
     zoom: data.zoom,
+    projection: ""equirectangular"",
 }).fitBounds(boundingBox);
 
 
