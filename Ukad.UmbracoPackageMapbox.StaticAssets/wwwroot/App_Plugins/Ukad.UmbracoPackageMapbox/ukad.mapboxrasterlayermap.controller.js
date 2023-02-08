@@ -8,6 +8,7 @@
         "umbRequestHelper",
         "$http",
         "editorService",
+        "MapboxMapsFactory",
         function (
             $scope,
             $element,
@@ -15,7 +16,8 @@
             userService,
             umbRequestHelper,
             $http,
-            editorService
+            editorService,
+            mapsFactory
         ) {
             const vm = this;
 
@@ -822,23 +824,11 @@
                 return inside;
             };
 
-            async function getSettings() {
-                const response = await umbRequestHelper.resourcePromise(
-                    $http.get(
-                        umbRequestHelper.getApiUrl(
-                            "mapboxBaseUrl",
-                            "GetSettings"
-                        )
-                    ),
-                    "Failed to retrieve Mapbox Settings"
-                );
-
-                return response?.accessToken || "";
-            }
-
-            getSettings().then(async (accessToken) => {
-                vm.accessToken = accessToken;
-                initMapboxMap();
+            mapsFactory.initialize(() => {
+                mapsFactory.getSettings().then(async (accessToken) => {
+                    vm.accessToken = accessToken;
+                    initMapboxMap();
+                });
             });
         },
     ]);
