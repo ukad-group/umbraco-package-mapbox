@@ -14,9 +14,8 @@ namespace Ukad.UmbracoPackageMapbox.Core.Extensions
                 .Append<AutocompleteCssFile>()
                 .Append<MapboxMarkerMapControllerJsFile>()
                 .Append<MapboxRasterLayerMapControllerJsFile>()
-                .Append<MapboxJsFile>()
-                .Append<MapboxCssFile>()
-                .Append<StylesCssFile>();
+                .Append<StylesCssFile>()
+                .Append<MapsFactoryJsFile>();
             builder.RegisterMapboxSettings();
             builder.AddNotificationHandler<ServerVariablesParsingNotification, ServerVariablesParsingHandler>();
 
