@@ -116,6 +116,7 @@
                     animate: false,
                     style: "mapbox://styles/mapbox/streets-v12",
                     zoom: initValue.zoom,
+                    projection: "equirectangular",
                 });
 
                 if (isMarkerExists) {
