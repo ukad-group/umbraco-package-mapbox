@@ -138,7 +138,7 @@
                     ? getBoundingBox(initValue)
                     : getBoundingBox(defaultValue);
 
-                vm.map.fitBounds(vm.initBox);
+                vm.map.fitBounds(vm.initBox, { center: vm.initBox.getCenter() });
 
                 vm.map.addControl(new mapboxgl.NavigationControl());
                 vm.map.dragRotate.disable();

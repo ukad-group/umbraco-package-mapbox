@@ -144,7 +144,7 @@
                 }
 
                 if (isBoundingBoxExists) {
-                    vm.map.fitBounds(getBoundingBox(initValue));
+                    vm.map.fitBounds(getBoundingBox(initValue), { center: getBoundingBox(initValue).getCenter() });
                 }
 
                 vm.map.addControl(new mapboxgl.NavigationControl());
@@ -423,7 +423,7 @@
                             northEast
                         );
 
-                        vm.map.fitBounds(boundingBox);
+                        vm.map.fitBounds(boundingBox, { center: boundingBox.getCenter() });
 
                         if (vm.currentMarker) {
                             vm.currentMarker.remove();

@@ -61,7 +61,7 @@ const map = new mapboxgl.Map({
     ],
     zoom: markermapdata.zoom,
     projection: ""equirectangular"",
-}).fitBounds(boundingBox);
+}).fitBounds(boundingBox, { center: boundingBox.getCenter()});
 
 if (markermapdata.marker && markermapdata.marker.longitude && markermapdata.marker.latitude) {
     const marker = new mapboxgl.Marker({ draggable: false })
@@ -109,7 +109,7 @@ const map = new mapboxgl.Map({
     ],
     zoom: data.zoom,
     projection: ""equirectangular"",
-}).fitBounds(boundingBox);
+}).fitBounds(boundingBox, { center: boundingBox.getCenter()});
 
 
 map.on(""load"", () => 
