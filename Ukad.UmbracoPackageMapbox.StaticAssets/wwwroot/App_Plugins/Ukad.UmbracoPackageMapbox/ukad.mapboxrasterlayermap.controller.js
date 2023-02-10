@@ -131,13 +131,14 @@
                     animate: false,
                     style: "mapbox://styles/mapbox/streets-v12",
                     zoom: initValue.zoom,
+                    projection: "equirectangular",
                 });
 
                 vm.initBox = isBoundingBoxExists
                     ? getBoundingBox(initValue)
                     : getBoundingBox(defaultValue);
 
-                vm.map.fitBounds(vm.initBox);
+                vm.map.fitBounds(vm.initBox, { center: vm.initBox.getCenter() });
 
                 vm.map.addControl(new mapboxgl.NavigationControl());
                 vm.map.dragRotate.disable();
@@ -168,7 +169,7 @@
                     const canvas = vm.map.getCanvasContainer();
 
                     const sizeMultiplier = 0.15;
-
+                    let rotationDot = [0, 0];
                     const mapContainer = document.getElementById(vm.mapId);
                     let containerSize = {
                         width: mapContainer.offsetWidth,
@@ -220,10 +221,10 @@
                         });
                     };
 
-                    const drawDots = () => {
-                        Object.values(vm.dots).map((dot, i) => {
-                            const pointName = Object.keys(vm.dots)[i];
-                            const pointId = `point-${i}`;
+                    const drawScaleDots = () => {
+                        Object.values(vm.dots).map((dot, dotIndex) => {
+                            const pointName = Object.keys(vm.dots)[dotIndex];
+                            const pointId = `point-${dotIndex}`;
 
                             if (vm.map.getLayer(pointId)) {
                                 vm.map.removeLayer(pointId);
@@ -242,7 +243,7 @@
                                 source: pointId,
                                 paint: {
                                     "circle-radius": 7,
-                                    "circle-color": "#3bb2d0", // red color
+                                    "circle-color": "#3bb2d0",
                                 },
                             });
                             vm.map.on("mouseenter", pointId, () => {
@@ -271,17 +272,16 @@
 
                                 const onDragPoint = (e) => {
                                     isDraggingDot = true;
-                                    vm.dots[pointName] = e.lngLat.toArray();
-                                    vm.map
-                                        .getSource(pointId)
-                                        ?.setData(
-                                            getDotGeoJson(e.lngLat.toArray())
-                                        );
+                                    vm.dots = calcScaledCoordinates(vm.dots, dotIndex, e.lngLat);
+                                    rotationDot = calcRotationDotCoordinates(vm.dots);
                                     vm.map
                                         .getSource("image")
                                         ?.setCoordinates(
                                             Object.values(vm.dots)
-                                        );
+                                    );
+                                    vm.map
+                                        .getSource("rotation-dot")
+                                        ?.setData(getDotGeoJson(rotationDot));
                                 };
 
                                 vm.map.on("mousemove", onDragPoint);
@@ -290,6 +290,87 @@
                                     setLayerProperty("image", 1);
                                     vm.map.off("mousemove", onDragPoint);
                                 });
+                            });
+                        });
+                    };
+
+                    const drawRotationDot = () => {
+                        if (vm.map.getLayer("rotation-dot")) {
+                            vm.map.removeLayer("rotation-dot");
+                        }
+                        if (vm.map.getSource("rotation-dot")) {
+                            vm.map.removeSource("rotation-dot");
+                        }
+
+                        rotationDot = calcRotationDotCoordinates(vm.dots);
+                        vm.map.addSource("rotation-dot", {
+                            type: "geojson",
+                            data: getDotGeoJson(rotationDot),
+                        });
+                        vm.map.addLayer({
+                            id: "rotation-dot",
+                            type: "circle",
+                            source: "rotation-dot",
+                            paint: {
+                                "circle-radius": 7,
+                                "circle-color": "#3bb2d0",
+                            },
+                        });
+
+                        vm.map.on("mouseenter", "rotation-dot", () => {
+                            vm.map.setPaintProperty("rotation-dot", "circle-color", "#F84C4C");
+                            canvas.style.cursor = "ew-resize";
+                        });
+
+                        vm.map.on("mouseleave", "rotation-dot", () => {
+                            vm.map.setPaintProperty("rotation-dot", "circle-color", "#3bb2d0");
+                            canvas.style.cursor = "";
+                        });
+
+                        vm.map.on("mousedown", "rotation-dot", (e) => {
+                            e.preventDefault();
+
+                            canvas.style.cursor = "grab";
+                            setLayerProperty("image", 0.5);
+
+                            const onDragPoint = (e) => {
+                                isDraggingDot = true;
+
+                                vm.map
+                                    .getSource("image")
+                                    ?.setCoordinates(
+                                        Object.values(
+                                            calcRotatedCoordinates(vm.dots, rotationDot, e.lngLat)
+                                        )
+                                    );
+                            };
+
+                            vm.map.on("mousemove", onDragPoint);
+                            vm.map.once("mouseup", (e) => {
+                                vm.dots = calcRotatedCoordinates(vm.dots, rotationDot, e.lngLat);
+
+                                for (let i = 0; i < 4; i++) {
+                                    const pointId = `point-${i}`;
+
+                                    vm.map
+                                        .getSource(pointId)
+                                        ?.setData(getDotGeoJson(Object.values(vm.dots)[i]));
+
+                                    setTimeout(() => {
+                                        setLayerProperty(pointId, 1, "circle-opacity");
+                                    }, 100);
+                                }
+
+                                rotationDot = calcRotationDotCoordinates(vm.dots);
+
+                                vm.map.getSource("image")?.setCoordinates(Object.values(vm.dots));
+                                vm.map
+                                    .getSource("rotation-dot")
+                                    ?.setData(getDotGeoJson(rotationDot));
+
+                                isDraggingDot = false;
+                                setLayerProperty("image", 1);
+                                vm.map.off("mousemove", onDragPoint);
                             });
                         });
                     };
@@ -346,6 +427,10 @@
                             setLayerProperty(pointId, 0, "circle-opacity");
                         }
 
+                        setLayerProperty("rotation-dot", 0, "circle-opacity");
+                        vm.map
+                            .getSource("rotation-dot")
+                            ?.setData(getDotGeoJson(calcRotationDotCoordinates(vm.dots)));
                         vm.map
                             .getSource("image")
                             ?.setCoordinates(Object.values(vm.dots));
@@ -370,13 +455,27 @@
                                 ?.setData(
                                     getDotGeoJson(Object.values(vm.dots)[i])
                                 );
-
-                            setLayerProperty(pointId, 1, "circle-opacity");
+                            setTimeout(() => {
+                                setLayerProperty(pointId, 1, "circle-opacity");
+                            }, 100);
                         }
+
+                        vm.map
+                            .getSource("rotation-dot")
+                            ?.setData(getDotGeoJson(calcRotationDotCoordinates(vm.dots)));
+                        setTimeout(() => {
+                            setLayerProperty("rotation-dot", 1, "circle-opacity");
+                        }, 100);
 
                         if (wasDragging) {
                             return;
                         }
+
+                        const isOnImage = isPointInsidePolygon(
+                            e.lngLat.toArray(),
+                            Object.values(vm.dots)
+                        );
+                        if (isOnImage) return;
 
                         if (!vm.image) {
                             return;
@@ -421,7 +520,8 @@
                         };
 
                         drawImage();
-                        drawDots();
+                        drawScaleDots();
+                        drawRotationDot();
                         updateModel();
                     });
 
@@ -430,7 +530,8 @@
 
                     if (isPlacedImageExists) {
                         drawImage();
-                        drawDots();
+                        drawScaleDots();
+                        drawRotationDot();
                     }
 
                     vm.map.resize();
@@ -820,6 +921,198 @@
                 }
 
                 return inside;
+            };
+
+            // calc angle ABC
+            // expecting coordinates for each point
+            const calcAngle = (A, B, C) => {
+                const x1 = A[0] - B[0]; // Vector 1 - x
+                const y1 = A[1] - B[1]; // Vector 1 - y
+
+                const x2 = C[0] - B[0]; // Vector 2 - x
+                const y2 = C[1] - B[1]; // Vector 2 - y
+
+                let angle = Math.atan2(y1, x1) - Math.atan2(y2, x2);
+                angle = (angle * 360) / (2 * Math.PI);
+
+                // if (angle < 0) {
+                //   angle += 360;
+                // }
+
+                return angle;
+            };
+
+            const calcRotationDotCoordinates = (rectangleDots) => {
+                const rectangleDotsArray = Object.values(rectangleDots);
+                const [ACoordinates, BCoordinates, CCoordinates, DCoordinates] =
+                    rectangleDotsArray;
+                const imageCenterCoordinates = turf.center(
+                    turf.points(rectangleDotsArray)
+                ).geometry.coordinates;
+
+                if (BCoordinates[0] - ACoordinates[0] === 0) {
+                    const distance = CCoordinates[1] - ACoordinates[1];
+                    return [
+                        imageCenterCoordinates[0] + (distance / 4) * 3,
+                        imageCenterCoordinates[1],
+                    ];
+                } else if (BCoordinates[1] - ACoordinates[1] === 0) {
+                    const distance = CCoordinates[0] - ACoordinates[0];
+                    return [
+                        imageCenterCoordinates[0],
+                        imageCenterCoordinates[1] + (distance / 4) * 3,
+                    ];
+                }
+
+                const slope =
+                    (BCoordinates[1] - ACoordinates[1]) /
+                    (BCoordinates[0] - ACoordinates[0]);
+
+                const aMultiplier = slope;
+                const bMultiplier = -1;
+                const cMultiplier = slope * -ACoordinates[0] + ACoordinates[1];
+
+                const temp =
+                    (-2 *
+                        (aMultiplier * imageCenterCoordinates[0] +
+                            bMultiplier * imageCenterCoordinates[1] +
+                            cMultiplier)) /
+                    (aMultiplier * aMultiplier + bMultiplier * bMultiplier);
+                return [
+                    ((temp * aMultiplier) / 4) * 3 + imageCenterCoordinates[0],
+                    ((temp * bMultiplier) / 4) * 3 + imageCenterCoordinates[1],
+                ];
+            };
+
+            // straightDotsCoordinatesArray is an array of two dots coordinates on this straight
+            const calcDotToStragightDistance = (
+                dotCoordinates,
+                straightDotsCoordinatesArray
+            ) => {
+                // was using this https://cutt.ly/59F0j6v
+                // and this https://cutt.ly/n9F0gtK
+                const [ACoordinates, BCoordinates] = straightDotsCoordinatesArray;
+
+                if (BCoordinates[0] - ACoordinates[0] === 0) {
+                    return Math.abs(dotCoordinates[0] - BCoordinates[0]);
+                } else if (BCoordinates[1] - ACoordinates[1] === 0) {
+                    return Math.abs(dotCoordinates[1] - BCoordinates[1]);
+                }
+
+                const slope =
+                    (BCoordinates[1] - ACoordinates[1]) /
+                    (BCoordinates[0] - ACoordinates[0]);
+
+                const aMultiplier = slope;
+                const bMultiplier = -1;
+                const cMultiplier = slope * -ACoordinates[0] + ACoordinates[1];
+
+                const distance =
+                    Math.abs(
+                        aMultiplier * dotCoordinates[0] +
+                        bMultiplier * dotCoordinates[1] +
+                        cMultiplier
+                    ) / Math.sqrt(aMultiplier * aMultiplier + bMultiplier * bMultiplier);
+
+                return distance;
+            };
+
+            const calcScaledCoordinates = (
+                oldCoordinates,
+                scalingDotIndex,
+                newDotLngLat
+            ) => {
+                const oldCoordinatesArray = Object.values(oldCoordinates);
+                const oldDotCoordinates = oldCoordinatesArray[scalingDotIndex];
+
+                const oppositeDotIndex = (scalingDotIndex + 2) % 4;
+                const oppositeDotCoordinates = oldCoordinatesArray[oppositeDotIndex];
+
+                const segmentOne = [
+                    oldCoordinatesArray[(scalingDotIndex + 1) % 4],
+                    oldCoordinatesArray[(scalingDotIndex + 2) % 4],
+                ];
+                const segmentTwo = [
+                    oldCoordinatesArray[(scalingDotIndex + 2) % 4],
+                    oldCoordinatesArray[(scalingDotIndex + 3) % 4],
+                ];
+
+                const newDotCoordinates = newDotLngLat.toArray();
+
+                const distanceOne = calcDotToStragightDistance(
+                    newDotCoordinates,
+                    segmentOne
+                );
+                const distanceTwo = calcDotToStragightDistance(
+                    newDotCoordinates,
+                    segmentTwo
+                );
+
+                let newDistance;
+                if (distanceOne > distanceTwo) {
+                    newDistance = distanceOne;
+                } else {
+                    newDistance = distanceTwo;
+                }
+
+                const oldDistance = calcDotToStragightDistance(
+                    oldDotCoordinates,
+                    segmentOne
+                );
+                if (!oldDistance) return oldCoordinates;
+                const scaleFactor = newDistance / oldDistance;
+                if (scaleFactor <= 0) {
+                    return oldCoordinates;
+                }
+
+                const polygon = turf.polygon([
+                    [...oldCoordinatesArray, oldCoordinatesArray[0]],
+                ]);
+                const scaledPolygon = turf.transformScale(polygon, scaleFactor, {
+                    origin: oppositeDotCoordinates,
+                });
+
+                const newDotsCoordinatesArray =
+                    scaledPolygon.geometry.coordinates[0].slice(0, 4);
+
+                return {
+                    topLeft: newDotsCoordinatesArray[0],
+                    topRight: newDotsCoordinatesArray[1],
+                    bottomRight: newDotsCoordinatesArray[2],
+                    bottomLeft: newDotsCoordinatesArray[3],
+                };
+            };
+
+            const calcRotatedCoordinates = (
+                oldCoordinates,
+                oldDotCoordinates,
+                newDotLngLat
+            ) => {
+                const oldCoordinatesArray = Object.values(oldCoordinates);
+
+                const imageCenterCoordinates = turf.center(
+                    turf.points(oldCoordinatesArray)
+                ).geometry.coordinates;
+
+                const rotatingAngle = calcAngle(
+                    oldDotCoordinates,
+                    imageCenterCoordinates,
+                    newDotLngLat.toArray()
+                );
+
+                const poly = turf.polygon([
+                    [...oldCoordinatesArray, oldCoordinatesArray[0]],
+                ]);
+                const options = { pivot: imageCenterCoordinates };
+                const rotatedPoly = turf.transformRotate(poly, rotatingAngle, options);
+
+                const newDotsCoordinatesArray = rotatedPoly.geometry.coordinates[0];
+                return {
+                    topLeft: newDotsCoordinatesArray[0],
+                    topRight: newDotsCoordinatesArray[1],
+                    bottomRight: newDotsCoordinatesArray[2],
+                    bottomLeft: newDotsCoordinatesArray[3],
+                };
             };
 
             async function getSettings() {
