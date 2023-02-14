@@ -164,6 +164,9 @@
 
                 vm.map.on("click", onMapClick);
                 vm.map.on("moveend", updateModel);
+                vm.map.on("zoomstart", () => {
+                    vm.startZoom = vm.map.getZoom()
+                });
                 vm.map.on("zoomend", updateZoom);
 
                 vm.map.on("contextmenu", function () {
@@ -305,10 +308,24 @@
 
             function updateZoom() { 
                 $timeout(() => {
-                    if (vm.roundZoomToNatural) {
-                        vm.map.setZoom(Math.round(vm.map.getZoom()))
+                    const zoom = vm.map.getZoom();
+                    const deltaZoom = vm.startZoom != null
+                        ? zoom - vm.startZoom
+                        : 0;
+
+                    if (vm.roundZoomToNatural && deltaZoom != 0) {
+                        if (deltaZoom >= 0.5 || deltaZoom <= -0.5) {
+                            vm.map.setZoom(Math.round(zoom))
+                        }
+                        else if (deltaZoom > 0) {
+                            vm.map.setZoom(Math.round(zoom + 1))
+                        }
+                        else {
+                            vm.map.setZoom(Math.round(zoom - 1))
+                        }
                     }
 
+                    vm.startZoom = null
                     updateModel()
                 }, 0);
             }
