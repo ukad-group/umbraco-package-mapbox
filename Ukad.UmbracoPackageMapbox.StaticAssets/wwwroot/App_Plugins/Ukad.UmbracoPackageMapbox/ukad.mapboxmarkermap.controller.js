@@ -62,6 +62,10 @@
                 $scope.model.config.showZoom != null
                     ? Object.toBoolean($scope.model.config.showZoom)
                     : false;
+            vm.roundZoomToNatural =
+                $scope.model.config.roundZoomToNatural != null
+                    ? Object.toBoolean($scope.model.config.roundZoomToNatural)
+                    : false;
 
             async function initMapboxMap() {
                 const defaultValue = {
@@ -160,7 +164,7 @@
 
                 vm.map.on("click", onMapClick);
                 vm.map.on("moveend", updateModel);
-                vm.map.on("zoomend", updateModel);
+                vm.map.on("zoomend", updateZoom);
 
                 vm.map.on("contextmenu", function () {
                     if (
@@ -299,13 +303,26 @@
                 }
             }
 
+            function updateZoom() { 
+                $timeout(() => {
+                    if (vm.roundZoomToNatural) {
+                        vm.map.setZoom(Math.round(vm.map.getZoom()))
+                    }
+
+                    updateModel()
+                }, 0);
+            }
+
             function updateModel() {
                 $timeout(function () {
                     $scope.model.value = {};
                     $scope.model.value.marker = {};
 
-                    $scope.model.value.zoom = vm.map.getZoom();
-                    vm.inputZoom = vm.map.getZoom();
+                    const zoom = vm.roundZoomToNatural
+                        ? Math.round(vm.map.getZoom())
+                        : vm.map.getZoom();
+                    $scope.model.value.zoom = zoom;
+                    vm.inputZoom = zoom;
 
                     if (!$scope.model.value.boundingBox) {
                         $scope.model.value.boundingBox = {};

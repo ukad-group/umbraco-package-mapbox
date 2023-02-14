@@ -78,6 +78,10 @@
                 $scope.model.config.showZoom != null
                     ? Object.toBoolean($scope.model.config.showZoom)
                     : false;
+            vm.roundZoomToNatural =
+                $scope.model.config.roundZoomToNatural != null
+                    ? Object.toBoolean($scope.model.config.roundZoomToNatural)
+                    : false;
 
             async function initMapboxMap() {
                 const defaultValue = {
@@ -526,7 +530,7 @@
                     });
 
                     vm.map.on("moveend", updateModel);
-                    vm.map.on("zoomend", updateModel);
+                    vm.map.on("zoomend", updateZoom);
 
                     if (isPlacedImageExists) {
                         drawImage();
@@ -714,6 +718,16 @@
                 updateModel();
             }
 
+            function updateZoom() {
+                $timeout(() => {
+                    if (vm.roundZoomToNatural) {
+                        vm.map.setZoom(Math.round(vm.map.getZoom()))
+                    }
+
+                    updateModel()
+                }, 0);
+            }
+
             function updateModel() {
                 $timeout(function () {
                     $scope.model.value = {};
@@ -724,8 +738,11 @@
 
                     $scope.model.value.image = vm.image ? vm.image : null;
 
-                    $scope.model.value.zoom = vm.map.getZoom();
-                    vm.inputZoom = vm.map.getZoom();
+                    const zoom = vm.roundZoomToNatural
+                        ? Math.round(vm.map.getZoom())
+                        : vm.map.getZoom();
+                    $scope.model.value.zoom = zoom;
+                    vm.inputZoom = zoom;
 
                     if (!$scope.model.value.boundingBox) {
                         $scope.model.value.boundingBox = {};
