@@ -1,4 +1,5 @@
 ﻿using System.Runtime.Serialization;
+using System.Xml.Linq;
 using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Ukad.UmbracoPackageMapbox.Core.Configs
@@ -28,5 +29,9 @@ namespace Ukad.UmbracoPackageMapbox.Core.Configs
         [DataMember(Name = "showZoom")]
         [ConfigurationField("showZoom", "Show Zoom", Constants.BooleanView, Description = "Show zoom level above map.")]
         public bool ShowZoom { get; set; } = false;
+
+        [DataMember(Name = "roundZoomToNatural")]
+        [ConfigurationField("roundZoomToNatural", "Round Zoom", Constants.BooleanView, Description = "Round Zoom to natural numbers.")]
+        public bool RoundZoomToNatural { get; set; } = true;
     }
 }
