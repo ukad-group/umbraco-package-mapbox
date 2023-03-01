@@ -62,6 +62,10 @@
                 $scope.model.config.showZoom != null
                     ? Object.toBoolean($scope.model.config.showZoom)
                     : false;
+            vm.roundZoomToNatural =
+                $scope.model.config.roundZoomToNatural != null
+                    ? Object.toBoolean($scope.model.config.roundZoomToNatural)
+                    : false;
 
             async function initMapboxMap() {
                 const defaultValue = {
@@ -116,6 +120,7 @@
                     animate: false,
                     style: "mapbox://styles/mapbox/streets-v12",
                     zoom: initValue.zoom,
+                    projection: "equirectangular",
                 });
 
                 if (isMarkerExists) {
@@ -143,7 +148,7 @@
                 }
 
                 if (isBoundingBoxExists) {
-                    vm.map.fitBounds(getBoundingBox(initValue));
+                    vm.map.fitBounds(getBoundingBox(initValue), { center: getBoundingBox(initValue).getCenter() });
                 }
 
                 vm.map.addControl(new mapboxgl.NavigationControl());
@@ -159,7 +164,10 @@
 
                 vm.map.on("click", onMapClick);
                 vm.map.on("moveend", updateModel);
-                vm.map.on("zoomend", updateModel);
+                vm.map.on("zoomstart", () => {
+                    vm.startZoom = vm.map.getZoom()
+                });
+                vm.map.on("zoomend", updateZoom);
 
                 vm.map.on("contextmenu", function () {
                     if (
@@ -298,13 +306,40 @@
                 }
             }
 
+            function updateZoom() { 
+                $timeout(() => {
+                    const zoom = vm.map.getZoom();
+                    const deltaZoom = vm.startZoom != null
+                        ? zoom - vm.startZoom
+                        : 0;
+
+                    if (vm.roundZoomToNatural && deltaZoom != 0) {
+                        if (deltaZoom >= 0.5 || deltaZoom <= -0.5) {
+                            vm.map.setZoom(Math.round(zoom))
+                        }
+                        else if (deltaZoom > 0) {
+                            vm.map.setZoom(Math.round(zoom + 1))
+                        }
+                        else {
+                            vm.map.setZoom(Math.round(zoom - 1))
+                        }
+                    }
+
+                    vm.startZoom = null
+                    updateModel()
+                }, 0);
+            }
+
             function updateModel() {
                 $timeout(function () {
                     $scope.model.value = {};
                     $scope.model.value.marker = {};
 
-                    $scope.model.value.zoom = vm.map.getZoom();
-                    vm.inputZoom = vm.map.getZoom();
+                    const zoom = vm.roundZoomToNatural
+                        ? Math.round(vm.map.getZoom())
+                        : vm.map.getZoom();
+                    $scope.model.value.zoom = zoom;
+                    vm.inputZoom = zoom;
 
                     if (!$scope.model.value.boundingBox) {
                         $scope.model.value.boundingBox = {};
@@ -422,7 +457,7 @@
                             northEast
                         );
 
-                        vm.map.fitBounds(boundingBox);
+                        vm.map.fitBounds(boundingBox, { center: boundingBox.getCenter() });
 
                         if (vm.currentMarker) {
                             vm.currentMarker.remove();

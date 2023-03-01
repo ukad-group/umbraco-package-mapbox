@@ -15,6 +15,7 @@ namespace Ukad.UmbracoPackageMapbox.Core.Extensions
                 .Append<MapboxMarkerMapControllerJsFile>()
                 .Append<MapboxRasterLayerMapControllerJsFile>()
                 .Append<MapboxJsFile>()
+                .Append<TurfJsFile>()
                 .Append<MapboxCssFile>()
                 .Append<StylesCssFile>();
             builder.RegisterMapboxSettings();
