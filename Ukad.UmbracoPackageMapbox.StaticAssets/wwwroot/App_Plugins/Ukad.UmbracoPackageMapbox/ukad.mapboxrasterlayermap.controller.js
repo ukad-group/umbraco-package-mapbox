@@ -142,6 +142,9 @@
                     ? getBoundingBox(initValue)
                     : getBoundingBox(defaultValue);
 
+                vm.map.jumpTo({
+                    center: vm.initBox.getCenter()
+                });
                 vm.map.fitBounds(vm.initBox, { center: vm.initBox.getCenter() });
 
                 vm.map.addControl(new mapboxgl.NavigationControl());
@@ -784,25 +787,8 @@
                         $scope.model.value.boundingBox.northEastCorner = {};
                     }
 
-                    //TODO fix initial shift
-
-                    let northEastCorner;
-                    let southWestCorner;
-
-                    if (vm.initBox) {
-                        northEastCorner = vm.initBox.getNorthEast();
-                        southWestCorner = vm.initBox.getSouthWest();
-
-                        vm.initBox = null;
-
-                        vm.map.fitBounds([
-                            [northEastCorner.lng, northEastCorner.lat],
-                            [southWestCorner.lng, southWestCorner.lat],
-                        ]);
-                    } else {
-                        northEastCorner = vm.map.getBounds().getNorthEast();
-                        southWestCorner = vm.map.getBounds().getSouthWest();
-                    }
+                    const northEastCorner = vm.map.getBounds().getNorthEast();
+                    const southWestCorner = vm.map.getBounds().getSouthWest();
 
                     $scope.model.value.boundingBox.northEastCorner.latitude =
                         northEastCorner.lat;
