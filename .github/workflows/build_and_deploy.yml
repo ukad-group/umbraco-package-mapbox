@@ -24,13 +24,6 @@ jobs:
           version: latest
           github_token: ${{ secrets.GITHUB_TOKEN }}
           pre_release_tag: ${{ env.PRE_RELEASE_TAG }}
-      - uses: actions/cache@v3
-        name: Setup nuget package cache
-        with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-
           
   build-and-push-mapbox-core:
     runs-on: ubuntu-latest
@@ -46,9 +39,16 @@ jobs:
       - name: Build
         run: dotnet build Ukad.UmbracoPackageMapbox.Core/Ukad.UmbracoPackageMapbox.Core.csproj --configuration Release --no-restore
       - name: Pack
-        run: dotnet pack Ukad.UmbracoPackageMapbox.Core/Ukad.UmbracoPackageMapbox.Core.csproj --configuration Release --output artifacts /p:Version=${{ env.VERSION }}
+        run: dotnet pack Ukad.UmbracoPackageMapbox.Core/Ukad.UmbracoPackageMapbox.Core.csproj --configuration Release --output artifacts /p:Version=${{ needs.init.outputs.version }}
       - name: Push
         run: dotnet nuget push artifacts/Ukad.UmbracoPackageMapbox.Core.${{ needs.init.outputs.version }}.nupkg -k ${{ secrets.UKAD_NUGET_SRV_API_KEY }} -s https://nuget.ukad.dev/nuget/internal/ --no-symbols
+      - uses: actions/cache@v3
+        name: Setup nuget package cache
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
 
   build-and-push-mapbox-static-assets:
     runs-on: ubuntu-latest
@@ -64,9 +64,16 @@ jobs:
       - name: Build
         run: dotnet build Ukad.UmbracoPackageMapbox.StaticAssets/Ukad.UmbracoPackageMapbox.StaticAssets.csproj --configuration Release --no-restore
       - name: Pack
-        run: dotnet pack Ukad.UmbracoPackageMapbox.StaticAssets/Ukad.UmbracoPackageMapbox.StaticAssets.csproj --configuration Release --output artifacts /p:Version=${{ env.VERSION }}
+        run: dotnet pack Ukad.UmbracoPackageMapbox.StaticAssets/Ukad.UmbracoPackageMapbox.StaticAssets.csproj --configuration Release --output artifacts /p:Version=${{ needs.init.outputs.version }}
       - name: Push
         run: dotnet nuget push artifacts/Ukad.UmbracoPackageMapbox.StaticAssets.${{ needs.init.outputs.version }}.nupkg -k ${{ secrets.UKAD_NUGET_SRV_API_KEY }} -s https://nuget.ukad.dev/nuget/internal/ --no-symbols
+      - uses: actions/cache@v3
+        name: Setup nuget package cache
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
 
   build-and-push-mapbox:
     runs-on: ubuntu-latest
@@ -82,6 +89,13 @@ jobs:
     - name: Build
       run: dotnet build Ukad.UmbracoPackageMapbox/Ukad.UmbracoPackageMapbox.csproj --configuration Release --no-restore
     - name: Pack
-      run: dotnet pack Ukad.UmbracoPackageMapbox/Ukad.UmbracoPackageMapbox.csproj --configuration Release --output artifacts /p:Version=${{ env.VERSION }}
+      run: dotnet pack Ukad.UmbracoPackageMapbox/Ukad.UmbracoPackageMapbox.csproj --configuration Release --output artifacts /p:Version=${{ needs.init.outputs.version }}
     - name: Push
       run: dotnet nuget push artifacts/Ukad.UmbracoPackageMapbox.${{ needs.init.outputs.version }}.nupkg -k ${{ secrets.UKAD_NUGET_SRV_API_KEY }} -s https://nuget.ukad.dev/nuget/internal/ --no-symbols
+    - uses: actions/cache@v3
+      name: Setup nuget package cache
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+            ${{ runner.os }}-nuget-
