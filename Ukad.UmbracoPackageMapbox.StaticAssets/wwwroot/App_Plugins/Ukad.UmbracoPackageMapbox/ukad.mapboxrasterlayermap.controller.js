@@ -142,6 +142,9 @@
                     ? getBoundingBox(initValue)
                     : getBoundingBox(defaultValue);
 
+                vm.map.jumpTo({
+                    center: vm.initBox.getCenter()
+                });
                 vm.map.fitBounds(vm.initBox, { center: vm.initBox.getCenter() });
 
                 vm.map.addControl(new mapboxgl.NavigationControl());
@@ -277,15 +280,17 @@
                                 const onDragPoint = (e) => {
                                     isDraggingDot = true;
                                     vm.dots = calcScaledCoordinates(vm.dots, dotIndex, e.lngLat);
-                                    rotationDot = calcRotationDotCoordinates(vm.dots);
                                     vm.map
                                         .getSource("image")
                                         ?.setCoordinates(
                                             Object.values(vm.dots)
                                     );
-                                    vm.map
-                                        .getSource("rotation-dot")
-                                        ?.setData(getDotGeoJson(rotationDot));
+                                    rotationDot = calcRotationDotCoordinates(vm.dots);
+                                    if (rotationDot) {
+                                        vm.map
+                                            .getSource("rotation-dot")
+                                            ?.setData(getDotGeoJson(rotationDot));
+                                    }
                                 };
 
                                 vm.map.on("mousemove", onDragPoint);
@@ -307,10 +312,12 @@
                         }
 
                         rotationDot = calcRotationDotCoordinates(vm.dots);
-                        vm.map.addSource("rotation-dot", {
-                            type: "geojson",
-                            data: getDotGeoJson(rotationDot),
-                        });
+                        if (rotationDot) {
+                            vm.map.addSource("rotation-dot", {
+                                type: "geojson",
+                                data: getDotGeoJson(rotationDot),
+                            });
+                        }
                         vm.map.addLayer({
                             id: "rotation-dot",
                             type: "circle",
@@ -368,9 +375,11 @@
                                 rotationDot = calcRotationDotCoordinates(vm.dots);
 
                                 vm.map.getSource("image")?.setCoordinates(Object.values(vm.dots));
-                                vm.map
-                                    .getSource("rotation-dot")
-                                    ?.setData(getDotGeoJson(rotationDot));
+                                if (rotationDot) {
+                                    vm.map
+                                        .getSource("rotation-dot")
+                                        ?.setData(getDotGeoJson(rotationDot));
+                                }
 
                                 isDraggingDot = false;
                                 setLayerProperty("image", 1);
@@ -432,9 +441,12 @@
                         }
 
                         setLayerProperty("rotation-dot", 0, "circle-opacity");
-                        vm.map
-                            .getSource("rotation-dot")
-                            ?.setData(getDotGeoJson(calcRotationDotCoordinates(vm.dots)));
+                        const rotationDot = calcRotationDotCoordinates(vm.dots);
+                        if (rotationDot) {
+                            vm.map
+                                .getSource("rotation-dot")
+                                ?.setData(getDotGeoJson(rotationDot));
+                        }
                         vm.map
                             .getSource("image")
                             ?.setCoordinates(Object.values(vm.dots));
@@ -464,9 +476,12 @@
                             }, 100);
                         }
 
-                        vm.map
-                            .getSource("rotation-dot")
-                            ?.setData(getDotGeoJson(calcRotationDotCoordinates(vm.dots)));
+                        const rotationDot = calcRotationDotCoordinates(vm.dots);
+                        if (rotationDot) {
+                            vm.map
+                                .getSource("rotation-dot")
+                                ?.setData(getDotGeoJson(rotationDot));
+                        }
                         setTimeout(() => {
                             setLayerProperty("rotation-dot", 1, "circle-opacity");
                         }, 100);
@@ -772,25 +787,8 @@
                         $scope.model.value.boundingBox.northEastCorner = {};
                     }
 
-                    //TODO fix initial shift
-
-                    let northEastCorner;
-                    let southWestCorner;
-
-                    if (vm.initBox) {
-                        northEastCorner = vm.initBox.getNorthEast();
-                        southWestCorner = vm.initBox.getSouthWest();
-
-                        vm.initBox = null;
-
-                        vm.map.fitBounds([
-                            [northEastCorner.lng, northEastCorner.lat],
-                            [southWestCorner.lng, southWestCorner.lat],
-                        ]);
-                    } else {
-                        northEastCorner = vm.map.getBounds().getNorthEast();
-                        southWestCorner = vm.map.getBounds().getSouthWest();
-                    }
+                    const northEastCorner = vm.map.getBounds().getNorthEast();
+                    const southWestCorner = vm.map.getBounds().getSouthWest();
 
                     $scope.model.value.boundingBox.northEastCorner.latitude =
                         northEastCorner.lat;
@@ -979,8 +977,14 @@
 
             const calcRotationDotCoordinates = (rectangleDots) => {
                 const rectangleDotsArray = Object.values(rectangleDots);
+
+                if (rectangleDotsArray.find(d => d.length < 2)) {
+                    return null;
+                }
+
                 const [ACoordinates, BCoordinates, CCoordinates, DCoordinates] =
                     rectangleDotsArray;
+
                 const imageCenterCoordinates = turf.center(
                     turf.points(rectangleDotsArray)
                 ).geometry.coordinates;
