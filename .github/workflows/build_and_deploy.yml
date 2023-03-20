@@ -5,7 +5,10 @@ on:
       - main
       - development
   workflow_dispatch:
-      
+
+env:
+  NUGET_FEED: https://api.nuget.org/v3/index.json
+
 jobs:
   init:
     name: "Set version"
@@ -41,7 +44,7 @@ jobs:
       - name: Pack
         run: dotnet pack Ukad.UmbracoPackageMapbox.Core/Ukad.UmbracoPackageMapbox.Core.csproj --configuration Release --output artifacts /p:Version=${{ needs.init.outputs.version }}
       - name: Push
-        run: dotnet nuget push artifacts/Ukad.UmbracoPackageMapbox.Core.${{ needs.init.outputs.version }}.nupkg -k ${{ secrets.UKAD_NUGET_SRV_API_KEY }} -s https://nuget.ukad.dev/nuget/internal/ --no-symbols
+        run: dotnet nuget push artifacts/Ukad.UmbracoPackageMapbox.Core.${{ needs.init.outputs.version }}.nupkg -k ${{ secrets.UKAD_NUGET_SRV_API_KEY }} -s ${{ env.NUGET_FEED }} --no-symbols
       - uses: actions/cache@v3
         name: Setup nuget package cache
         with:
@@ -66,7 +69,7 @@ jobs:
       - name: Pack
         run: dotnet pack Ukad.UmbracoPackageMapbox.StaticAssets/Ukad.UmbracoPackageMapbox.StaticAssets.csproj --configuration Release --output artifacts /p:Version=${{ needs.init.outputs.version }}
       - name: Push
-        run: dotnet nuget push artifacts/Ukad.UmbracoPackageMapbox.StaticAssets.${{ needs.init.outputs.version }}.nupkg -k ${{ secrets.UKAD_NUGET_SRV_API_KEY }} -s https://nuget.ukad.dev/nuget/internal/ --no-symbols
+        run: dotnet nuget push artifacts/Ukad.UmbracoPackageMapbox.StaticAssets.${{ needs.init.outputs.version }}.nupkg -k ${{ secrets.UKAD_NUGET_SRV_API_KEY }} -s ${{ env.NUGET_FEED }} --no-symbols
       - uses: actions/cache@v3
         name: Setup nuget package cache
         with:
@@ -91,7 +94,7 @@ jobs:
     - name: Pack
       run: dotnet pack Ukad.UmbracoPackageMapbox/Ukad.UmbracoPackageMapbox.csproj --configuration Release --output artifacts /p:Version=${{ needs.init.outputs.version }}
     - name: Push
-      run: dotnet nuget push artifacts/Ukad.UmbracoPackageMapbox.${{ needs.init.outputs.version }}.nupkg -k ${{ secrets.UKAD_NUGET_SRV_API_KEY }} -s https://nuget.ukad.dev/nuget/internal/ --no-symbols
+      run: dotnet nuget push artifacts/Ukad.UmbracoPackageMapbox.${{ needs.init.outputs.version }}.nupkg -k ${{ secrets.UKAD_NUGET_SRV_API_KEY }} -s ${{ env.NUGET_FEED }} --no-symbols
     - uses: actions/cache@v3
       name: Setup nuget package cache
       with:
