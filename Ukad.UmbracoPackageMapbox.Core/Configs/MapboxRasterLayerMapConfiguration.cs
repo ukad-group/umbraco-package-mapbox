@@ -33,5 +33,9 @@ namespace Ukad.UmbracoPackageMapbox.Core.Configs
         [DataMember(Name = "roundZoomToNatural")]
         [ConfigurationField("roundZoomToNatural", "Round Zoom", Constants.BooleanView, Description = "Round Zoom to natural numbers.")]
         public bool RoundZoomToNatural { get; set; } = true;
+
+        [DataMember(Name = "showOpacity")]
+        [ConfigurationField("showOpacity", "Show Image Opacity", Constants.BooleanView, Description = "Show Image Opacity.")]
+        public bool ShowOpacity { get; set; } = true;
     }
 }
