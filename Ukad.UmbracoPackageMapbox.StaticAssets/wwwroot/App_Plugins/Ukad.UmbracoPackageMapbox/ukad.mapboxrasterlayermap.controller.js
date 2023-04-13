@@ -82,6 +82,10 @@
                 $scope.model.config.roundZoomToNatural != null
                     ? Object.toBoolean($scope.model.config.roundZoomToNatural)
                     : false;
+            vm.showOpacityEnabled =
+                $scope.model.config.showOpacity != null
+                    ? Object.toBoolean($scope.model.config.showOpacity)
+                    : false;
             vm.showOpacity = false;
 
             async function initMapboxMap() {
@@ -97,11 +101,14 @@
                         },
                     },
                     zoom: 9,
+                    opacity: 100
                 };
 
                 const initValue = $scope.model.value || defaultValue;
 
-                vm.inputOpacity = 100;
+                vm.inputOpacity = vm.showOpacityEnabled
+                    ? initValue.opacity
+                    : 100; 
 
                 initImageWithPoints(initValue);
 
@@ -593,7 +600,8 @@
                                         .toArray(),
                                 };
         
-                                vm.showOpacity = true;
+                                vm.showOpacity = vm.showOpacityEnabled;
+                                vm.inputOpacity = 100;
                 
                                 drawImage();
                                 drawScaleDots();
@@ -610,7 +618,8 @@
                     vm.map.on("zoomend", updateZoom);
 
                     if (isPlacedImageExists) {
-                        vm.showOpacity = true;
+                        vm.showOpacity = vm.showOpacityEnabled;
+                        vm.inputOpacity = 100;
 
                         drawImage();
                         drawScaleDots();
@@ -700,6 +709,7 @@
 
             function removeImage() {
                 vm.showOpacity = false;
+                vm.inputOpacity = 100;
                 vm.image = "";
                 clearPoints();
                 updateModel();
@@ -798,6 +808,7 @@
                     $scope.model.value.bottomRightPoint = {};
 
                     $scope.model.value.image = vm.image ? vm.image : null;
+                    $scope.model.value.opacity = vm.inputOpacity;
 
                     const zoom = vm.roundZoomToNatural
                         ? Math.round(vm.map.getZoom())
