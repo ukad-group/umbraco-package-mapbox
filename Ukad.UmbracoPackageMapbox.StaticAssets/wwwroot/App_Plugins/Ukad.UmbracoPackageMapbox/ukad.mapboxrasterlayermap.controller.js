@@ -22,7 +22,7 @@
             vm.updatePoints = updatePoints;
             vm.clearPoints = clearPoints;
             vm.setZoom = setZoom;
-            vm.selectImage = selectImage;
+            vm.selectImage = () => {};
             vm.removeImage = removeImage;
 
             vm.topLeftInputLatId = "topleft_Lat_" + String.CreateGuid();
@@ -59,8 +59,8 @@
             vm.showSetLayerByCoordinates =
                 $scope.model.config.showSetLayerByCoordinates != null
                     ? Object.toBoolean(
-                          $scope.model.config.showSetLayerByCoordinates
-                      )
+                        $scope.model.config.showSetLayerByCoordinates
+                    )
                     : false;
             vm.showZoom =
                 $scope.model.config.showZoom != null
@@ -82,6 +82,7 @@
                 $scope.model.config.roundZoomToNatural != null
                     ? Object.toBoolean($scope.model.config.roundZoomToNatural)
                     : false;
+            vm.showOpacity = false;
 
             async function initMapboxMap() {
                 const defaultValue = {
@@ -99,6 +100,8 @@
                 };
 
                 const initValue = $scope.model.value || defaultValue;
+
+                vm.inputOpacity = 100;
 
                 initImageWithPoints(initValue);
 
@@ -163,7 +166,7 @@
                     if (
                         vm.allowClear !== true &&
                         Object.toBoolean($scope.model.config.allowClear) !==
-                            true
+                        true
                     ) {
                         return;
                     }
@@ -172,11 +175,12 @@
                     //clearPoints();
                 });
 
-                vm.map.on("load", () => {
+                vm.map.on("load", async () => {
+                    vm.selectImage = selectImage;
+
                     const canvas = vm.map.getCanvasContainer();
 
                     const sizeMultiplier = 0.15;
-                    let rotationDot = [0, 0];
                     const mapContainer = document.getElementById(vm.mapId);
                     let containerSize = {
                         width: mapContainer.offsetWidth,
@@ -186,12 +190,6 @@
                     let isDragging = false;
                     let imageDraggingStartDots;
                     let isDraggingDot = false;
-
-                    const img = new Image();
-                    img.onload = function () {
-                        vm.imageAspectRatio = this.width / this.height;
-                    };
-                    img.src = vm.image;
 
                     const drawImage = () => {
                         if (vm.map.getLayer("image")) {
@@ -212,25 +210,17 @@
                             source: "image",
                             paint: {
                                 "raster-fade-duration": 0,
+                                "raster-opacity": vm.inputOpacity / 100
                             },
                         });
-                        vm.map.on("mousedown", (e) => {
-                            const isOnImage = isPointInsidePolygon(
-                                e.lngLat.toArray(),
-                                Object.values(vm.dots)
-                            );
-                            if (!isOnImage) return;
 
-                            vm.map.dragPan.disable();
-                            vm.map.once("mouseup", () => {
-                                vm.map.dragPan.enable();
-                            });
-                        });
+                        vm.setOpacity = () => {
+                          setLayerProperty("image", vm.inputOpacity / 100);
+                        };
                     };
 
                     const drawScaleDots = () => {
                         Object.values(vm.dots).map((dot, dotIndex) => {
-                            const pointName = Object.keys(vm.dots)[dotIndex];
                             const pointId = `point-${dotIndex}`;
 
                             if (vm.map.getLayer(pointId)) {
@@ -259,7 +249,11 @@
                                     "circle-color",
                                     "#F84C4C"
                                 );
-                                canvas.style.cursor = "move";
+                                if (dotIndex === 0 || dotIndex === 2) {
+                                  canvas.style.cursor = "nwse-resize";
+                                } else {
+                                  canvas.style.cursor = "nesw-resize";
+                                }
                             });
 
                             vm.map.on("mouseleave", pointId, () => {
@@ -276,6 +270,16 @@
 
                                 canvas.style.cursor = "grab";
                                 setLayerProperty("image", 0.5);
+                                Object.values(vm.dots).map((dot, i) => {
+                                    const pointId = `point-${i}`;
+                
+                                    if (vm.map.getLayer(pointId)) {
+                                        setLayerProperty(pointId, 0, "circle-opacity");
+                                    }
+                                    if (vm.map.getSource(pointId)) {
+                                        setLayerProperty(pointId, 0, "circle-opacity");
+                                    }
+                                });
 
                                 const onDragPoint = (e) => {
                                     isDraggingDot = true;
@@ -284,266 +288,320 @@
                                         .getSource("image")
                                         ?.setCoordinates(
                                             Object.values(vm.dots)
-                                    );
-                                    rotationDot = calcRotationDotCoordinates(vm.dots);
-                                    if (rotationDot) {
+                                        );
+
+                                    for (let i = 0; i < 4; i++) {
+                                        const pointId = `point-${i}`;
                                         vm.map
-                                            .getSource("rotation-dot")
-                                            ?.setData(getDotGeoJson(rotationDot));
+                                            .getSource(pointId)
+                                            ?.setData(
+                                                getDotGeoJson(Object.values(vm.dots)[i])
+                                            );
+                                        setLayerProperty(
+                                            pointId,
+                                            { duration: 0 },
+                                            "circle-opacity-transition"
+                                        );
+                                        setLayerProperty(pointId, 0, "circle-opacity");
                                     }
                                 };
 
                                 vm.map.on("mousemove", onDragPoint);
                                 vm.map.once("mouseup", (e) => {
                                     isDraggingDot = false;
-                                    setLayerProperty("image", 1);
+                                    Object.values(vm.dots).map((dot, dotIndex) => {
+                                      const pointId = `point-${dotIndex}`;
+
+                                      setLayerProperty(pointId, 1, "circle-opacity");
+                                    });
+
+                                    setLayerProperty("image", vm.inputOpacity / 100);
                                     vm.map.off("mousemove", onDragPoint);
                                 });
                             });
                         });
                     };
 
-                    const drawRotationDot = () => {
-                        if (vm.map.getLayer("rotation-dot")) {
-                            vm.map.removeLayer("rotation-dot");
-                        }
-                        if (vm.map.getSource("rotation-dot")) {
-                            vm.map.removeSource("rotation-dot");
-                        }
+                    // const drawRotationDot = () => {
+                    //     if (vm.map.getLayer("rotation-dot")) {
+                    //         vm.map.removeLayer("rotation-dot");
+                    //     }
+                    //     if (vm.map.getSource("rotation-dot")) {
+                    //         vm.map.removeSource("rotation-dot");
+                    //     }
 
-                        rotationDot = calcRotationDotCoordinates(vm.dots);
-                        if (rotationDot) {
-                            vm.map.addSource("rotation-dot", {
-                                type: "geojson",
-                                data: getDotGeoJson(rotationDot),
-                            });
-                        }
-                        vm.map.addLayer({
-                            id: "rotation-dot",
-                            type: "circle",
-                            source: "rotation-dot",
-                            paint: {
-                                "circle-radius": 7,
-                                "circle-color": "#3bb2d0",
-                            },
-                        });
+                    //     rotationDot = calcRotationDotCoordinates(vm.dots);
+                    //     if (rotationDot) {
+                    //         vm.map.addSource("rotation-dot", {
+                    //             type: "geojson",
+                    //             data: getDotGeoJson(rotationDot),
+                    //         });
+                    //     }
+                    //     vm.map.addLayer({
+                    //         id: "rotation-dot",
+                    //         type: "circle",
+                    //         source: "rotation-dot",
+                    //         paint: {
+                    //             "circle-radius": 7,
+                    //             "circle-color": "#3bb2d0",
+                    //         },
+                    //     });
 
-                        vm.map.on("mouseenter", "rotation-dot", () => {
-                            vm.map.setPaintProperty("rotation-dot", "circle-color", "#F84C4C");
-                            canvas.style.cursor = "ew-resize";
-                        });
+                    //     vm.map.on("mouseenter", "rotation-dot", () => {
+                    //         vm.map.setPaintProperty("rotation-dot", "circle-color", "#F84C4C");
+                    //         canvas.style.cursor = "ew-resize";
+                    //     });
 
-                        vm.map.on("mouseleave", "rotation-dot", () => {
-                            vm.map.setPaintProperty("rotation-dot", "circle-color", "#3bb2d0");
-                            canvas.style.cursor = "";
-                        });
+                    //     vm.map.on("mouseleave", "rotation-dot", () => {
+                    //         vm.map.setPaintProperty("rotation-dot", "circle-color", "#3bb2d0");
+                    //         canvas.style.cursor = "";
+                    //     });
 
-                        vm.map.on("mousedown", "rotation-dot", (e) => {
-                            e.preventDefault();
+                    //     vm.map.on("mousedown", "rotation-dot", (e) => {
+                    //         e.preventDefault();
 
-                            canvas.style.cursor = "grab";
-                            setLayerProperty("image", 0.5);
+                    //         canvas.style.cursor = "grab";
+                    //         setLayerProperty("image", 0.5);
 
-                            const onDragPoint = (e) => {
-                                isDraggingDot = true;
+                    //         const onDragPoint = (e) => {
+                    //             isDraggingDot = true;
 
-                                vm.map
-                                    .getSource("image")
-                                    ?.setCoordinates(
-                                        Object.values(
-                                            calcRotatedCoordinates(vm.dots, rotationDot, e.lngLat)
-                                        )
-                                    );
-                            };
+                    //             vm.map
+                    //                 .getSource("image")
+                    //                 ?.setCoordinates(
+                    //                     Object.values(
+                    //                         calcRotatedCoordinates(vm.dots, rotationDot, e.lngLat)
+                    //                     )
+                    //                 );
+                    //         };
 
-                            vm.map.on("mousemove", onDragPoint);
-                            vm.map.once("mouseup", (e) => {
-                                vm.dots = calcRotatedCoordinates(vm.dots, rotationDot, e.lngLat);
+                    //         vm.map.on("mousemove", onDragPoint);
+                    //         vm.map.once("mouseup", (e) => {
+                    //             vm.dots = calcRotatedCoordinates(vm.dots, rotationDot, e.lngLat);
 
-                                for (let i = 0; i < 4; i++) {
-                                    const pointId = `point-${i}`;
+                    //             for (let i = 0; i < 4; i++) {
+                    //                 const pointId = `point-${i}`;
 
-                                    vm.map
-                                        .getSource(pointId)
-                                        ?.setData(getDotGeoJson(Object.values(vm.dots)[i]));
+                    //                 vm.map
+                    //                     .getSource(pointId)
+                    //                     ?.setData(getDotGeoJson(Object.values(vm.dots)[i]));
 
-                                    setTimeout(() => {
-                                        setLayerProperty(pointId, 1, "circle-opacity");
-                                    }, 100);
-                                }
+                    //                 setTimeout(() => {
+                    //                     setLayerProperty(pointId, 1, "circle-opacity");
+                    //                 }, 100);
+                    //             }
 
-                                rotationDot = calcRotationDotCoordinates(vm.dots);
+                    //             rotationDot = calcRotationDotCoordinates(vm.dots);
 
-                                vm.map.getSource("image")?.setCoordinates(Object.values(vm.dots));
-                                if (rotationDot) {
-                                    vm.map
-                                        .getSource("rotation-dot")
-                                        ?.setData(getDotGeoJson(rotationDot));
-                                }
+                    //             vm.map.getSource("image")?.setCoordinates(Object.values(vm.dots));
+                    //             if (rotationDot) {
+                    //                 vm.map
+                    //                     .getSource("rotation-dot")
+                    //                     ?.setData(getDotGeoJson(rotationDot));
+                    //             }
 
-                                isDraggingDot = false;
-                                setLayerProperty("image", 1);
-                                vm.map.off("mousemove", onDragPoint);
-                            });
-                        });
-                    };
+                    //             isDraggingDot = false;
+                    //             setLayerProperty("image", vm.inputOpacity / 100);
+                    //             vm.map.off("mousemove", onDragPoint);
+                    //         });
+                    //     });
+                    // };
 
                     vm.map.on("mousedown", (e) => {
-                        mouseDownCoords = e.lngLat.toArray();
-                        imageDraggingStartDots = vm.dots;
-                    });
-
-                    vm.map.on("mousemove", (e) => {
-                        if (isDraggingDot || !imageDraggingStartDots) return;
-
-                        isDragging =
-                            mouseDownCoords &&
-                            e.lngLat.toArray().join("") !==
-                                mouseDownCoords.join("");
-
-                        if (!isDragging) return;
-
-                        setLayerProperty("image", 0.5);
-
-                        const coords = e.lngLat.toArray();
-                        const delta = mouseDownCoords.map(
-                            (value, i) => coords[i] - value
-                        );
-
-                        vm.dots = {
-                            topLeft: imageDraggingStartDots.topLeft.map(
-                                (value, i) => value + delta[i]
-                            ),
-                            topRight: imageDraggingStartDots.topRight.map(
-                                (value, i) => value + delta[i]
-                            ),
-                            bottomRight: imageDraggingStartDots.bottomRight.map(
-                                (value, i) => value + delta[i]
-                            ),
-                            bottomLeft: imageDraggingStartDots.bottomLeft.map(
-                                (value, i) => value + delta[i]
-                            ),
-                        };
-
-                        for (let i = 0; i < 4; i++) {
-                            const pointId = `point-${i}`;
-                            vm.map
-                                .getSource(pointId)
-                                ?.setData(
-                                    getDotGeoJson(Object.values(vm.dots)[i])
-                                );
-                            setLayerProperty(
-                                pointId,
-                                { duration: 0 },
-                                "circle-opacity-transition"
-                            );
-                            setLayerProperty(pointId, 0, "circle-opacity");
-                        }
-
-                        setLayerProperty("rotation-dot", 0, "circle-opacity");
-                        const rotationDot = calcRotationDotCoordinates(vm.dots);
-                        if (rotationDot) {
-                            vm.map
-                                .getSource("rotation-dot")
-                                ?.setData(getDotGeoJson(rotationDot));
-                        }
-                        vm.map
-                            .getSource("image")
-                            ?.setCoordinates(Object.values(vm.dots));
-                    });
-
-                    vm.map.on("mouseup", (e) => {
-                        let wasDragging =
-                            mouseDownCoords &&
-                            e.lngLat.toArray().join("") !==
-                                mouseDownCoords.join("");
-
-                        mouseDownCoords = null;
-                        isDragging = false;
-                        imageDraggingStartDots = null;
-                        setLayerProperty("image", 1);
-
-                        for (let i = 0; i < 4; i++) {
-                            const pointId = `point-${i}`;
-
-                            vm.map
-                                .getSource(pointId)
-                                ?.setData(
-                                    getDotGeoJson(Object.values(vm.dots)[i])
-                                );
-                            setTimeout(() => {
-                                setLayerProperty(pointId, 1, "circle-opacity");
-                            }, 100);
-                        }
-
-                        const rotationDot = calcRotationDotCoordinates(vm.dots);
-                        if (rotationDot) {
-                            vm.map
-                                .getSource("rotation-dot")
-                                ?.setData(getDotGeoJson(rotationDot));
-                        }
-                        setTimeout(() => {
-                            setLayerProperty("rotation-dot", 1, "circle-opacity");
-                        }, 100);
-
-                        if (wasDragging) {
-                            return;
-                        }
-
                         const isOnImage = isPointInsidePolygon(
                             e.lngLat.toArray(),
                             Object.values(vm.dots)
                         );
-                        if (isOnImage) return;
+                        if (!isOnImage) return;
 
-                        if (!vm.image) {
-                            return;
-                        }
+                        vm.map.dragPan.disable();
 
-                        const imageWidth = containerSize.width * sizeMultiplier;
-                        const imageHeight = imageWidth / vm.imageAspectRatio;
+                        mouseDownCoords = e.lngLat.toArray();
+                        imageDraggingStartDots = vm.dots;
 
-                        const center = e.point;
-                        const canvasDots = {
-                            topLeft: {
-                                x: center.x - imageWidth / 2,
-                                y: center.y - imageHeight / 2,
-                            },
-                            topRight: {
-                                x: center.x + imageWidth / 2,
-                                y: center.y - imageHeight / 2,
-                            },
-                            bottomRight: {
-                                x: center.x + imageWidth / 2,
-                                y: center.y + imageHeight / 2,
-                            },
-                            bottomLeft: {
-                                x: center.x - imageWidth / 2,
-                                y: center.y + imageHeight / 2,
-                            },
+                        Object.values(vm.dots).map((dot, i) => {
+                            const pointId = `point-${i}`;
+        
+                            if (vm.map.getLayer(pointId)) {
+                                setLayerProperty(pointId, 0, "circle-opacity");
+                            }
+                            if (vm.map.getSource(pointId)) {
+                                setLayerProperty(pointId, 0, "circle-opacity");
+                            }
+                        });
+
+                        const onMoveImage = (e) => {
+                            if (isDraggingDot || !imageDraggingStartDots) return;
+      
+                            isDragging =
+                                mouseDownCoords &&
+                                e.lngLat.toArray().join("") !==
+                                mouseDownCoords.join("");
+      
+                            if (!isDragging) return;
+      
+                            setLayerProperty("image", 0.5);
+      
+                            const coords = e.lngLat.toArray();
+                            const delta = mouseDownCoords.map(
+                                (value, i) => coords[i] - value
+                            );
+      
+                            vm.dots = {
+                                topLeft: imageDraggingStartDots.topLeft.map(
+                                    (value, i) => value + delta[i]
+                                ),
+                                topRight: imageDraggingStartDots.topRight.map(
+                                    (value, i) => value + delta[i]
+                                ),
+                                bottomRight: imageDraggingStartDots.bottomRight.map(
+                                    (value, i) => value + delta[i]
+                                ),
+                                bottomLeft: imageDraggingStartDots.bottomLeft.map(
+                                    (value, i) => value + delta[i]
+                                ),
+                            };
+      
+                            for (let i = 0; i < 4; i++) {
+                                const pointId = `point-${i}`;
+                                vm.map
+                                    .getSource(pointId)
+                                    ?.setData(
+                                        getDotGeoJson(Object.values(vm.dots)[i])
+                                    );
+                                setLayerProperty(
+                                    pointId,
+                                    { duration: 0 },
+                                    "circle-opacity-transition"
+                                );
+                                setLayerProperty(pointId, 0, "circle-opacity");
+                            }
+
+                            vm.map
+                                .getSource("image")
+                                ?.setCoordinates(Object.values(vm.dots));
                         };
 
-                        vm.dots = {
-                            topLeft: vm.map
-                                .unproject(canvasDots.topLeft)
-                                .toArray(),
-                            topRight: vm.map
-                                .unproject(canvasDots.topRight)
-                                .toArray(),
-                            bottomRight: vm.map
-                                .unproject(canvasDots.bottomRight)
-                                .toArray(),
-                            bottomLeft: vm.map
-                                .unproject(canvasDots.bottomLeft)
-                                .toArray(),
-                        };
+                        vm.map.on("mousemove", onMoveImage);
+                        vm.map.once("mouseup", () => {
+                            vm.map.dragPan.enable();
+                            setLayerProperty("image", vm.inputOpacity / 100);
 
-                        drawImage();
-                        drawScaleDots();
-                        drawRotationDot();
-                        updateModel();
+                            Object.values(vm.dots).map((dot, dotIndex) => {
+                              const pointId = `point-${dotIndex}`;
+
+                              setLayerProperty(pointId, 1, "circle-opacity");
+                            });
+
+                            updateModel();
+                            vm.map.off("mousemove", onMoveImage);
+                        });
                     });
 
+                    function selectImage() {
+                        editorService.mediaPicker({
+                            onlyImages: true,
+                            multiPicker: false,
+                            callback: function (item) {
+                                $scope.value = {
+                                    id: item.id,
+                                    icon: item.icon,
+                                    name: item.name,
+                                    image: item.image,
+                                    alt: getValueOf(item.properties, "Alt"),
+                                };
+                            },
+                            close: function () {
+                                editorService.close();
+                            },
+                            submit: async function (data) {
+                                removeImage();
+                                processSelection(data.selection[0].image);
+                                editorService.close();
+
+                                const loadImage = () => {
+                                    return new Promise((resolve, reject) => {
+                                        const img = new Image();
+
+                                        img.onload = () => resolve(img);
+                                        img.onerror = reject;
+                                        img.src = vm.image;
+                                    });
+                                };
+
+                                const image = await loadImage();
+
+                                vm.imageAspectRatio = image.width / image.height;
+
+                                setLayerProperty("image", vm.inputOpacity / 100);
+
+                                for (let i = 0; i < 4; i++) {
+                                    const pointId = `point-${i}`;
+        
+                                    vm.map
+                                        .getSource(pointId)
+                                        ?.setData(
+                                            getDotGeoJson(Object.values(vm.dots)[i])
+                                        );
+                                    setTimeout(() => {
+                                        setLayerProperty(pointId, 1, "circle-opacity");
+                                    }, 100);
+                                }
+        
+                                if (!vm.image) {
+                                    return;
+                                }
+        
+                                const imageWidth = containerSize.width * sizeMultiplier;
+                                const imageHeight = imageWidth / vm.imageAspectRatio;
+        
+                                const center = {
+                                  x: mapContainer.offsetWidth / 2,
+                                  y: mapContainer.offsetHeight / 2
+                                };
+                                const canvasDots = {
+                                    topLeft: {
+                                        x: center.x - imageWidth / 2,
+                                        y: center.y - imageHeight / 2,
+                                    },
+                                    topRight: {
+                                        x: center.x + imageWidth / 2,
+                                        y: center.y - imageHeight / 2,
+                                    },
+                                    bottomRight: {
+                                        x: center.x + imageWidth / 2,
+                                        y: center.y + imageHeight / 2,
+                                    },
+                                    bottomLeft: {
+                                        x: center.x - imageWidth / 2,
+                                        y: center.y + imageHeight / 2,
+                                    },
+                                };
+        
+                                vm.dots = {
+                                    topLeft: vm.map
+                                        .unproject(canvasDots.topLeft)
+                                        .toArray(),
+                                    topRight: vm.map
+                                        .unproject(canvasDots.topRight)
+                                        .toArray(),
+                                    bottomRight: vm.map
+                                        .unproject(canvasDots.bottomRight)
+                                        .toArray(),
+                                    bottomLeft: vm.map
+                                        .unproject(canvasDots.bottomLeft)
+                                        .toArray(),
+                                };
+        
+                                vm.showOpacity = true;
+                
+                                drawImage();
+                                drawScaleDots();
+                                updateModel();
+                            },
+                        });
+                    }
+                    
                     vm.map.on("zoomstart", () => {
                         vm.startZoom = vm.map.getZoom()
                     });
@@ -552,9 +610,10 @@
                     vm.map.on("zoomend", updateZoom);
 
                     if (isPlacedImageExists) {
+                        vm.showOpacity = true;
+
                         drawImage();
                         drawScaleDots();
-                        drawRotationDot();
                     }
 
                     vm.map.resize();
@@ -635,43 +694,12 @@
                 }
             }
 
-            function selectImage() {
-                editorService.mediaPicker({
-                    onlyImages: true,
-                    multiPicker: false,
-                    callback: function (item) {
-                        $scope.value = {
-                            id: item.id,
-                            icon: item.icon,
-                            name: item.name,
-                            image: item.image,
-                            alt: getValueOf(item.properties, "Alt"),
-                        };
-                    },
-                    close: function () {
-                        editorService.close();
-                    },
-                    submit: function (data) {
-                        removeImage();
-                        processSelection(data.selection[0].image);
-                        editorService.close();
-
-                        const img = new Image();
-                        img.onload = function () {
-                            vm.imageAspectRatio = this.width / this.height;
-                        };
-                        img.src = vm.image;
-
-                        updateModel();
-                    },
-                });
-            }
-
             function processSelection(selection) {
                 vm.image = selection;
             }
 
             function removeImage() {
+                vm.showOpacity = false;
                 vm.image = "";
                 clearPoints();
                 updateModel();
@@ -958,73 +986,73 @@
 
             // calc angle ABC
             // expecting coordinates for each point
-            const calcAngle = (A, B, C) => {
-                const x1 = A[0] - B[0]; // Vector 1 - x
-                const y1 = A[1] - B[1]; // Vector 1 - y
+            // const calcAngle = (A, B, C) => {
+            //     const x1 = A[0] - B[0]; // Vector 1 - x
+            //     const y1 = A[1] - B[1]; // Vector 1 - y
 
-                const x2 = C[0] - B[0]; // Vector 2 - x
-                const y2 = C[1] - B[1]; // Vector 2 - y
+            //     const x2 = C[0] - B[0]; // Vector 2 - x
+            //     const y2 = C[1] - B[1]; // Vector 2 - y
 
-                let angle = Math.atan2(y1, x1) - Math.atan2(y2, x2);
-                angle = (angle * 360) / (2 * Math.PI);
+            //     let angle = Math.atan2(y1, x1) - Math.atan2(y2, x2);
+            //     angle = (angle * 360) / (2 * Math.PI);
 
-                // if (angle < 0) {
-                //   angle += 360;
-                // }
+            //     // if (angle < 0) {
+            //     //   angle += 360;
+            //     // }
 
-                return angle;
-            };
+            //     return angle;
+            // };
 
-            const calcRotationDotCoordinates = (rectangleDots) => {
-                const rectangleDotsArray = Object.values(rectangleDots);
+            // const calcRotationDotCoordinates = (rectangleDots) => {
+            //     const rectangleDotsArray = Object.values(rectangleDots);
 
-                if (rectangleDotsArray.find(d => d.length < 2)) {
-                    return null;
-                }
+            //     if (rectangleDotsArray.find(d => d.length < 2)) {
+            //         return null;
+            //     }
 
-                const [ACoordinates, BCoordinates, CCoordinates, DCoordinates] =
-                    rectangleDotsArray;
+            //     const [ACoordinates, BCoordinates, CCoordinates, DCoordinates] =
+            //         rectangleDotsArray;
 
-                const imageCenterCoordinates = turf.center(
-                    turf.points(rectangleDotsArray)
-                ).geometry.coordinates;
+            //     const imageCenterCoordinates = turf.center(
+            //         turf.points(rectangleDotsArray)
+            //     ).geometry.coordinates;
 
-                if (BCoordinates[0] - ACoordinates[0] === 0) {
-                    const distance = CCoordinates[1] - ACoordinates[1];
-                    return [
-                        imageCenterCoordinates[0] + (distance / 4) * 3,
-                        imageCenterCoordinates[1],
-                    ];
-                } else if (BCoordinates[1] - ACoordinates[1] === 0) {
-                    const distance = CCoordinates[0] - ACoordinates[0];
-                    return [
-                        imageCenterCoordinates[0],
-                        imageCenterCoordinates[1] + (distance / 4) * 3,
-                    ];
-                }
+            //     if (BCoordinates[0] - ACoordinates[0] === 0) {
+            //         const distance = CCoordinates[1] - ACoordinates[1];
+            //         return [
+            //             imageCenterCoordinates[0] + (distance / 4) * 3,
+            //             imageCenterCoordinates[1],
+            //         ];
+            //     } else if (BCoordinates[1] - ACoordinates[1] === 0) {
+            //         const distance = CCoordinates[0] - ACoordinates[0];
+            //         return [
+            //             imageCenterCoordinates[0],
+            //             imageCenterCoordinates[1] + (distance / 4) * 3,
+            //         ];
+            //     }
 
-                const slope =
-                    (BCoordinates[1] - ACoordinates[1]) /
-                    (BCoordinates[0] - ACoordinates[0]);
+            //     const slope =
+            //         (BCoordinates[1] - ACoordinates[1]) /
+            //         (BCoordinates[0] - ACoordinates[0]);
 
-                const aMultiplier = slope;
-                const bMultiplier = -1;
-                const cMultiplier = slope * -ACoordinates[0] + ACoordinates[1];
+            //     const aMultiplier = slope;
+            //     const bMultiplier = -1;
+            //     const cMultiplier = slope * -ACoordinates[0] + ACoordinates[1];
 
-                const temp =
-                    (-2 *
-                        (aMultiplier * imageCenterCoordinates[0] +
-                            bMultiplier * imageCenterCoordinates[1] +
-                            cMultiplier)) /
-                    (aMultiplier * aMultiplier + bMultiplier * bMultiplier);
-                return [
-                    ((temp * aMultiplier) / 4) * 3 + imageCenterCoordinates[0],
-                    ((temp * bMultiplier) / 4) * 3 + imageCenterCoordinates[1],
-                ];
-            };
+            //     const temp =
+            //         (-2 *
+            //             (aMultiplier * imageCenterCoordinates[0] +
+            //                 bMultiplier * imageCenterCoordinates[1] +
+            //                 cMultiplier)) /
+            //         (aMultiplier * aMultiplier + bMultiplier * bMultiplier);
+            //     return [
+            //         ((temp * aMultiplier) / 4) * 3 + imageCenterCoordinates[0],
+            //         ((temp * bMultiplier) / 4) * 3 + imageCenterCoordinates[1],
+            //     ];
+            // };
 
             // straightDotsCoordinatesArray is an array of two dots coordinates on this straight
-            const calcDotToStragightDistance = (
+            const calcDotToStraightDistance = (
                 dotCoordinates,
                 straightDotsCoordinatesArray
             ) => {
@@ -1056,13 +1084,21 @@
                 return distance;
             };
 
+            const getDistanceBetweenTwoDots = (firstDotCoords, secondDotCoords) => {
+              const x1 = firstDotCoords[0];
+              const y1 = firstDotCoords[1];
+              const x2 = secondDotCoords[0];
+              const y2 = secondDotCoords[1];
+
+              return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+          };
+
             const calcScaledCoordinates = (
                 oldCoordinates,
                 scalingDotIndex,
                 newDotLngLat
             ) => {
                 const oldCoordinatesArray = Object.values(oldCoordinates);
-                const oldDotCoordinates = oldCoordinatesArray[scalingDotIndex];
 
                 const oppositeDotIndex = (scalingDotIndex + 2) % 4;
                 const oppositeDotCoordinates = oldCoordinatesArray[oppositeDotIndex];
@@ -1078,30 +1114,34 @@
 
                 const newDotCoordinates = newDotLngLat.toArray();
 
-                const distanceOne = calcDotToStragightDistance(
+                const distanceOnePrev = getDistanceBetweenTwoDots(
+                    oldCoordinatesArray[(scalingDotIndex + 2) % 4],
+                    oldCoordinatesArray[(scalingDotIndex + 3) % 4]
+                );
+
+                const distanceTwoPrev = getDistanceBetweenTwoDots(
+                    oldCoordinatesArray[(scalingDotIndex + 1) % 4],
+                    oldCoordinatesArray[(scalingDotIndex + 2) % 4]
+                );
+
+                const distanceOneCurr = calcDotToStraightDistance(
                     newDotCoordinates,
                     segmentOne
                 );
-                const distanceTwo = calcDotToStragightDistance(
+                const distanceTwoCurr = calcDotToStraightDistance(
                     newDotCoordinates,
                     segmentTwo
                 );
 
-                let newDistance;
-                if (distanceOne > distanceTwo) {
-                    newDistance = distanceOne;
-                } else {
-                    newDistance = distanceTwo;
-                }
+                const aspectRatioPrev = distanceOnePrev / distanceTwoPrev;
+                const aspectRatioCurr = distanceOneCurr / distanceTwoCurr;
 
-                const oldDistance = calcDotToStragightDistance(
-                    oldDotCoordinates,
-                    segmentOne
-                );
-                if (!oldDistance) return oldCoordinates;
-                const scaleFactor = newDistance / oldDistance;
-                if (scaleFactor <= 0) {
-                    return oldCoordinates;
+                let scaleFactor;
+
+                if (aspectRatioPrev > aspectRatioCurr) {
+                  scaleFactor = distanceOneCurr / distanceOnePrev;
+                } else {
+                  scaleFactor = distanceTwoCurr / distanceTwoPrev;
                 }
 
                 const polygon = turf.polygon([
@@ -1122,37 +1162,37 @@
                 };
             };
 
-            const calcRotatedCoordinates = (
-                oldCoordinates,
-                oldDotCoordinates,
-                newDotLngLat
-            ) => {
-                const oldCoordinatesArray = Object.values(oldCoordinates);
+            // const calcRotatedCoordinates = (
+            //     oldCoordinates,
+            //     oldDotCoordinates,
+            //     newDotLngLat
+            // ) => {
+            //     const oldCoordinatesArray = Object.values(oldCoordinates);
 
-                const imageCenterCoordinates = turf.center(
-                    turf.points(oldCoordinatesArray)
-                ).geometry.coordinates;
+            //     const imageCenterCoordinates = turf.center(
+            //         turf.points(oldCoordinatesArray)
+            //     ).geometry.coordinates;
 
-                const rotatingAngle = calcAngle(
-                    oldDotCoordinates,
-                    imageCenterCoordinates,
-                    newDotLngLat.toArray()
-                );
+            //     const rotatingAngle = calcAngle(
+            //         oldDotCoordinates,
+            //         imageCenterCoordinates,
+            //         newDotLngLat.toArray()
+            //     );
 
-                const poly = turf.polygon([
-                    [...oldCoordinatesArray, oldCoordinatesArray[0]],
-                ]);
-                const options = { pivot: imageCenterCoordinates };
-                const rotatedPoly = turf.transformRotate(poly, rotatingAngle, options);
+            //     const poly = turf.polygon([
+            //         [...oldCoordinatesArray, oldCoordinatesArray[0]],
+            //     ]);
+            //     const options = { pivot: imageCenterCoordinates };
+            //     const rotatedPoly = turf.transformRotate(poly, rotatingAngle, options);
 
-                const newDotsCoordinatesArray = rotatedPoly.geometry.coordinates[0];
-                return {
-                    topLeft: newDotsCoordinatesArray[0],
-                    topRight: newDotsCoordinatesArray[1],
-                    bottomRight: newDotsCoordinatesArray[2],
-                    bottomLeft: newDotsCoordinatesArray[3],
-                };
-            };
+            //     const newDotsCoordinatesArray = rotatedPoly.geometry.coordinates[0];
+            //     return {
+            //         topLeft: newDotsCoordinatesArray[0],
+            //         topRight: newDotsCoordinatesArray[1],
+            //         bottomRight: newDotsCoordinatesArray[2],
+            //         bottomLeft: newDotsCoordinatesArray[3],
+            //     };
+            // };
 
             async function getSettings() {
                 const response = await umbRequestHelper.resourcePromise(
