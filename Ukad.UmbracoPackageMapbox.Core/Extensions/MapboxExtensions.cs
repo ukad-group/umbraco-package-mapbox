@@ -138,6 +138,7 @@ if (data.image
                             source: ""image"",
                             paint: {
                                 ""raster-fade-duration"": 0,
+                                ""raster-opacity"": data.opacity / 100
                             },
                         });
 

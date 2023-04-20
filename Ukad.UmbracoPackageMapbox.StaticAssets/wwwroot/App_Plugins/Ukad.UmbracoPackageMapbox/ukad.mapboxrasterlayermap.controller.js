@@ -108,7 +108,7 @@
 
                 vm.inputOpacity = vm.showOpacityEnabled
                     ? initValue.opacity
-                    : 100; 
+                    : 100;
 
                 initImageWithPoints(initValue);
 
@@ -222,7 +222,7 @@
                         });
 
                         vm.setOpacity = () => {
-                          setLayerProperty("image", vm.inputOpacity / 100);
+                            setLayerProperty("image", vm.inputOpacity / 100);
                         };
                     };
 
@@ -257,9 +257,9 @@
                                     "#F84C4C"
                                 );
                                 if (dotIndex === 0 || dotIndex === 2) {
-                                  canvas.style.cursor = "nwse-resize";
+                                    canvas.style.cursor = "nwse-resize";
                                 } else {
-                                  canvas.style.cursor = "nesw-resize";
+                                    canvas.style.cursor = "nesw-resize";
                                 }
                             });
 
@@ -317,9 +317,9 @@
                                 vm.map.once("mouseup", (e) => {
                                     isDraggingDot = false;
                                     Object.values(vm.dots).map((dot, dotIndex) => {
-                                      const pointId = `point-${dotIndex}`;
+                                        const pointId = `point-${dotIndex}`;
 
-                                      setLayerProperty(pointId, 1, "circle-opacity");
+                                        setLayerProperty(pointId, 1, "circle-opacity");
                                     });
 
                                     setLayerProperty("image", vm.inputOpacity / 100);
@@ -495,9 +495,9 @@
                             setLayerProperty("image", vm.inputOpacity / 100);
 
                             Object.values(vm.dots).map((dot, dotIndex) => {
-                              const pointId = `point-${dotIndex}`;
+                                const pointId = `point-${dotIndex}`;
 
-                              setLayerProperty(pointId, 1, "circle-opacity");
+                                setLayerProperty(pointId, 1, "circle-opacity");
                             });
 
                             updateModel();
@@ -563,8 +563,8 @@
                                 const imageHeight = imageWidth / vm.imageAspectRatio;
         
                                 const center = {
-                                  x: mapContainer.offsetWidth / 2,
-                                  y: mapContainer.offsetHeight / 2
+                                    x: mapContainer.offsetWidth / 2,
+                                    y: mapContainer.offsetHeight / 2
                                 };
                                 const canvasDots = {
                                     topLeft: {
@@ -601,7 +601,6 @@
                                 };
         
                                 vm.showOpacity = vm.showOpacityEnabled;
-                                vm.inputOpacity = 100;
                 
                                 drawImage();
                                 drawScaleDots();
@@ -619,7 +618,6 @@
 
                     if (isPlacedImageExists) {
                         vm.showOpacity = vm.showOpacityEnabled;
-                        vm.inputOpacity = 100;
 
                         drawImage();
                         drawScaleDots();
@@ -808,6 +806,7 @@
                     $scope.model.value.bottomRightPoint = {};
 
                     $scope.model.value.image = vm.image ? vm.image : null;
+
                     $scope.model.value.opacity = vm.inputOpacity;
 
                     const zoom = vm.roundZoomToNatural
@@ -1096,13 +1095,13 @@
             };
 
             const getDistanceBetweenTwoDots = (firstDotCoords, secondDotCoords) => {
-              const x1 = firstDotCoords[0];
-              const y1 = firstDotCoords[1];
-              const x2 = secondDotCoords[0];
-              const y2 = secondDotCoords[1];
+                const x1 = firstDotCoords[0];
+                const y1 = firstDotCoords[1];
+                const x2 = secondDotCoords[0];
+                const y2 = secondDotCoords[1];
 
-              return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-          };
+                return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+            };
 
             const calcScaledCoordinates = (
                 oldCoordinates,
@@ -1150,9 +1149,9 @@
                 let scaleFactor;
 
                 if (aspectRatioPrev > aspectRatioCurr) {
-                  scaleFactor = distanceOneCurr / distanceOnePrev;
+                    scaleFactor = distanceOneCurr / distanceOnePrev;
                 } else {
-                  scaleFactor = distanceTwoCurr / distanceTwoPrev;
+                    scaleFactor = distanceTwoCurr / distanceTwoPrev;
                 }
 
                 const polygon = turf.polygon([
