@@ -1,12 +1,10 @@
 <div ng-controller="Ukad.UmbracoPackageMapbox.MarkerMap.Controller as vm">
     <div ng-if="vm.showSearch" class="osm-auto-search mb3">
-        <umb-search-filter
-            input-id="{{vm.inputId}}"
-            model="vm.term"
-            label-key="placeholders_search"
-            text="Type to search..."
-            css-class="w-100 "
-        >
+        <umb-search-filter input-id="{{vm.inputId}}"
+                           model="vm.term"
+                           label-key="placeholders_search"
+                           text="Type to search..."
+                           css-class="w-100 ">
         </umb-search-filter>
     </div>
 
@@ -14,51 +12,43 @@
         <div ng-if="vm.showSetMarkerByCoordinates" class="coords-lng-label">
             Longitude:
         </div>
-        <input
-            ng-if="vm.showSetMarkerByCoordinates"
-            type="number"
-            ng-model="vm.inputLng"
-            id="{{vm.inputLngId}}"
-            ng-change="vm.setMarker()"
-            placeholder="Longitude"
-            class="coords-lng-input"
-        />
+        <input ng-if="vm.showSetMarkerByCoordinates"
+               type="number"
+               ng-model="vm.inputLng"
+               id="{{vm.inputLngId}}"
+               ng-change="vm.setMarker()"
+               placeholder="Longitude"
+               class="coords-lng-input" />
 
-        <umb-button
-            ng-if="vm.allowClear && vm.showSetMarkerByCoordinates"
-            type="button"
-            label="Clear"
-            label-ley="general_clear"
-            button-style="outline"
-            disabled="!model.value.marker"
-            action="vm.clearMarker()"
-            class="coords-clear-btn"
-        >
+        <umb-button ng-if="vm.allowClear && vm.showSetMarkerByCoordinates"
+                    type="button"
+                    label="Clear"
+                    label-ley="general_clear"
+                    button-style="outline"
+                    disabled="!model.value.marker"
+                    action="vm.clearMarker()"
+                    class="coords-clear-btn">
         </umb-button>
 
         <div ng-if="vm.showSetMarkerByCoordinates" class="coords-lat-label">
             Latitude:
         </div>
-        <input
-            ng-if="vm.showSetMarkerByCoordinates"
-            type="number"
-            ng-model="vm.inputLat"
-            id="{{vm.inputLatId}}"
-            ng-change="vm.setMarker()"
-            placeholder="Latitude"
-            class="coords-lat-input"
-        />
+        <input ng-if="vm.showSetMarkerByCoordinates"
+               type="number"
+               ng-model="vm.inputLat"
+               id="{{vm.inputLatId}}"
+               ng-change="vm.setMarker()"
+               placeholder="Latitude"
+               class="coords-lat-input" />
 
         <div ng-if="vm.showZoom" class="coords-zoom-label">Zoom:</div>
-        <input
-            ng-if="vm.showZoom"
-            type="number"
-            ng-model="vm.inputZoom"
-            id="{{vm.inputZoomId}}"
-            ng-change="vm.setZoom()"
-            placeholder="Zoom"
-            class="coords-zoom-input"
-        />
+        <input ng-if="vm.showZoom"
+               type="number"
+               ng-model="vm.inputZoom"
+               id="{{vm.inputZoomId}}"
+               ng-change="vm.setZoom()"
+               placeholder="Zoom"
+               class="coords-zoom-input" />
     </div>
 
     <div ng-show="!vm.showLoader">
