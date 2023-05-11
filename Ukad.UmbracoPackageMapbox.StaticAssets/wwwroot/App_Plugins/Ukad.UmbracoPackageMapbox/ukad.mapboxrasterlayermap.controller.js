@@ -235,6 +235,12 @@
                         if (vm.map.getSource("image")) {
                             vm.map.removeSource("image");
                         }
+                        if (vm.map.getLayer("outline")) {
+                            vm.map.removeLayer("outline");
+                        }
+                        if (vm.map.getSource("frame")) {
+                            vm.map.removeSource("frame");
+                        }
 
                         vm.map.addSource("image", {
                             type: "image",
@@ -250,6 +256,29 @@
                                 "raster-opacity": vm.inputOpacity / 100
                             },
                         });
+
+                        vm.map.addSource("frame", {
+                            type: "geojson",
+                            data: {
+                                type: "Feature",
+                                geometry: {
+                                    type: "LineString",
+                                    coordinates: [...Object.values(vm.dots), Object.values(vm.dots)[0]]
+                                }
+                            }
+                        });
+                        vm.map.addLayer({
+                            id: "outline",
+                            type: "line",
+                            source: "frame",
+                            paint: {
+                                "line-color": "#000",
+                                "line-width": 1,
+                                "line-opacity": 0.3,
+                                "line-dasharray": [2, 2]
+                            }
+                        });
+
                         vm.setOpacity = () => {
                             setLayerProperty("image", vm.inputOpacity / 100);
                         };
@@ -276,14 +305,14 @@
                                 source: pointId,
                                 paint: {
                                     "circle-radius": 7,
-                                    "circle-color": "#3bb2d0",
+                                    "circle-color": "#F84C4C",
                                 },
                             });
                             vm.map.on("mouseenter", pointId, () => {
                                 vm.map.setPaintProperty(
                                     pointId,
                                     "circle-color",
-                                    "#F84C4C"
+                                    "#FFBF00"
                                 );
                                 if (dotIndex === 0 || dotIndex === 2) {
                                     canvas.style.cursor = "nwse-resize";
@@ -296,7 +325,7 @@
                                 vm.map.setPaintProperty(
                                     pointId,
                                     "circle-color",
-                                    "#3bb2d0"
+                                    "#F84C4C"
                                 );
                                 canvas.style.cursor = "";
                             });
@@ -311,15 +340,15 @@
                                     const pointId = `point-${i}`;
                 
                                     if (vm.map.getLayer(pointId)) {
-                                        setLayerProperty(pointId, 0, "circle-opacity");
+                                        setLayerProperty(pointId, 0.5, "circle-opacity");
                                     }
                                     if (vm.map.getSource(pointId)) {
-                                        setLayerProperty(pointId, 0, "circle-opacity");
+                                        setLayerProperty(pointId, 0.5, "circle-opacity");
                                     }
                                 });
 
-                                if (vm.map.getSource('rotation-dot')) {
-                                    setLayerProperty('rotation-dot', 0, "circle-opacity");
+                                if (vm.map.getSource("rotation-dot")) {
+                                    setLayerProperty("rotation-dot", 0.5, "circle-opacity");
                                 }
 
                                 const onDragPoint = (e) => {
@@ -344,7 +373,7 @@
                                             { duration: 0 },
                                             "circle-opacity-transition"
                                         );
-                                        setLayerProperty(pointId, 0, "circle-opacity");
+                                        setLayerProperty(pointId, 0.5, "circle-opacity");
                                     }
 
                                     if (vm.rotationDot) {
@@ -352,6 +381,14 @@
                                             .getSource("rotation-dot")
                                             ?.setData(getDotGeoJson(vm.rotationDot));
                                     }
+
+                                    vm.map.getSource("frame")?.setData({
+                                        type: "Feature",
+                                        geometry: {
+                                            type: "LineString",
+                                            coordinates: [...Object.values(vm.dots), Object.values(vm.dots)[0]]
+                                        }
+                                    });
                                 };
 
                                 vm.map.on("mousemove", onDragPoint);
@@ -363,7 +400,7 @@
                                         setLayerProperty(pointId, 1, "circle-opacity");
                                     });
 
-                                    setLayerProperty('rotation-dot', 1, "circle-opacity");
+                                    setLayerProperty("rotation-dot", 1, "circle-opacity");
                                     setLayerProperty("image", vm.inputOpacity / 100);
                                     vm.map.off("mousemove", onDragPoint);
                                     vm.map.scrollZoom.enable();
@@ -393,17 +430,17 @@
                             source: "rotation-dot",
                             paint: {
                                 "circle-radius": 7,
-                                "circle-color": "#3bb2d0",
+                                "circle-color": "#F84C4C",
                             },
                         });
 
                         vm.map.on("mouseenter", "rotation-dot", () => {
-                            vm.map.setPaintProperty("rotation-dot", "circle-color", "#F84C4C");
+                            vm.map.setPaintProperty("rotation-dot", "circle-color", "#FFBF00");
                             canvas.style.cursor = "ew-resize";
                         });
 
                         vm.map.on("mouseleave", "rotation-dot", () => {
-                            vm.map.setPaintProperty("rotation-dot", "circle-color", "#3bb2d0");
+                            vm.map.setPaintProperty("rotation-dot", "circle-color", "#F84C4C");
                             canvas.style.cursor = "";
                         });
 
@@ -417,15 +454,15 @@
                                 const pointId = `point-${i}`;
             
                                 if (vm.map.getLayer(pointId)) {
-                                    setLayerProperty(pointId, 0, "circle-opacity");
+                                    setLayerProperty(pointId, 0.5, "circle-opacity");
                                 }
                                 if (vm.map.getSource(pointId)) {
-                                    setLayerProperty(pointId, 0, "circle-opacity");
+                                    setLayerProperty(pointId, 0.5, "circle-opacity");
                                 }
                             });
 
-                            if (vm.map.getSource('rotation-dot')) {
-                                setLayerProperty('rotation-dot', 0, "circle-opacity");
+                            if (vm.map.getSource("rotation-dot")) {
+                                setLayerProperty("rotation-dot", 0.5, "circle-opacity");
                             }
 
                             const onDragPoint = (e) => {
@@ -450,7 +487,7 @@
                                         { duration: 0 },
                                         "circle-opacity-transition"
                                     );
-                                    setLayerProperty(pointId, 0, "circle-opacity");
+                                    setLayerProperty(pointId, 0.5, "circle-opacity");
                                 }
 
                                 if (vm.rotationDot) {
@@ -458,6 +495,14 @@
                                         .getSource("rotation-dot")
                                         ?.setData(getDotGeoJson(vm.rotationDot));
                                 }
+
+                                vm.map.getSource("frame")?.setData({
+                                    type: "Feature",
+                                    geometry: {
+                                        type: "LineString",
+                                        coordinates: [...Object.values(vm.dots), Object.values(vm.dots)[0]]
+                                    }
+                                });
                             };
 
                             vm.map.on("mousemove", onDragPoint);
@@ -475,7 +520,7 @@
                                         ?.setData(getDotGeoJson(vm.rotationDot));
                                 }
 
-                                setLayerProperty('rotation-dot', 1, "circle-opacity");
+                                setLayerProperty("rotation-dot", 1, "circle-opacity");
                                 setLayerProperty("image", vm.inputOpacity / 100);
                                 vm.map.off("mousemove", onDragPoint);
                                 vm.map.scrollZoom.enable();
@@ -497,15 +542,15 @@
                             const pointId = `point-${i}`;
         
                             if (vm.map.getLayer(pointId)) {
-                                setLayerProperty(pointId, 0, "circle-opacity");
+                                setLayerProperty(pointId, 0.5, "circle-opacity");
                             }
                             if (vm.map.getSource(pointId)) {
-                                setLayerProperty(pointId, 0, "circle-opacity");
+                                setLayerProperty(pointId, 0.5, "circle-opacity");
                             }
                         });
 
-                        if (vm.map.getSource('rotation-dot')) {
-                            setLayerProperty('rotation-dot', 0, "circle-opacity");
+                        if (vm.map.getSource("rotation-dot")) {
+                            setLayerProperty("rotation-dot", 0.5, "circle-opacity");
                         }
 
                         if (isOnImage) {
@@ -539,7 +584,7 @@
                                     { duration: 0 },
                                     "circle-opacity-transition"
                                 );
-                                setLayerProperty(pointId, 0, "circle-opacity");
+                                setLayerProperty(pointId, 0.5, "circle-opacity");
                             }
 
                             vm.map
@@ -551,6 +596,14 @@
                                     .getSource("rotation-dot")
                                     ?.setData(getDotGeoJson(vm.rotationDot));
                             }
+
+                            vm.map.getSource("frame")?.setData({
+                                type: "Feature",
+                                geometry: {
+                                    type: "LineString",
+                                    coordinates: [...Object.values(vm.dots), Object.values(vm.dots)[0]]
+                                }
+                            });
                         };
 
                         vm.map.on("mousemove", onMoveImage);
@@ -564,7 +617,7 @@
                                 setLayerProperty(pointId, 1, "circle-opacity");
                             });
 
-                            setLayerProperty('rotation-dot', 1, "circle-opacity");
+                            setLayerProperty("rotation-dot", 1, "circle-opacity");
 
                             updateModel();
                             vm.map.off("mousemove", onMoveImage);
@@ -778,6 +831,14 @@
 
                 if (vm.dots.bottomRight) {
                     vm.dots.bottomRight = [];
+                }
+
+                if (vm.map.getLayer("outline")) {
+                    vm.map.removeLayer("outline");
+                }
+
+                if (vm.map.getSource("frame")) {
+                    vm.map.removeSource("frame");
                 }
 
                 if (vm.map.getLayer("image")) {
