@@ -191,18 +191,10 @@
                     vm.selectImage = selectImage;
 
                     const canvas = vm.map.getCanvasContainer();
-
-                    const sizeMultiplier = 0.15;
-                    const mapContainer = document.getElementById(vm.mapId);
-                    let containerSize = {
-                        width: mapContainer.offsetWidth,
-                        height: mapContainer.height,
-                    };
                     let mouseDownCoords;
                     let isDragging = false;
                     let imageDraggingStartDots;
                     let isDraggingDot = false;
-                    
 
                     const defineDots = () => {
                         const [ x0, y0 ] = vm.centerCoordsPx;
@@ -657,13 +649,16 @@
 
                                 const image = await loadImage();
 
+                                const sizeMultiplier = 0.15;
+                                const mapContainer = document.getElementById(vm.mapId);
+
                                 vm.imageAspectRatio = image.width / image.height;
 
                                 if (!vm.image) {
                                     return;
                                 }
         
-                                const imageWidth = containerSize.width * sizeMultiplier;
+                                const imageWidth = mapContainer.offsetWidth * sizeMultiplier;
                                 const imageHeight = imageWidth / vm.imageAspectRatio;
 
                                 const dotsVectors = [
