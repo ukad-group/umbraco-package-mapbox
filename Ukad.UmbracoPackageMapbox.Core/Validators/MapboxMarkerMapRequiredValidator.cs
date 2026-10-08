@@ -25,12 +25,14 @@ namespace Ukad.UmbracoPackageMapbox.Core.Validators
                 yield break;
             }
 
-            if (value.ToString().DetectIsEmptyJson())
+            var json = value as string ?? _jsonSerializer.Serialize(value);
+
+            if (json.DetectIsEmptyJson())
             {
                 yield return new ValidationResult("Value cannot be empty", new[] { "value" });
             }
 
-            var model = _jsonSerializer.Deserialize<MapboxMarkerMapModel>(value.ToString());
+            var model = _jsonSerializer.Deserialize<MapboxMarkerMapModel>(json);
 
             if (model?.Marker is null)
             {

@@ -1,12 +1,10 @@
 ﻿using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Services;
 
 namespace Ukad.UmbracoPackageMapbox.Core.Configs
 {
-    public class MapboxRasterLayerMapConfigurationEditor : ConfigurationEditor<MapboxRasterLayerMapConfiguration>
+    public class MapboxRasterLayerMapConfigurationEditor : MapboxConfigurationEditor<MapboxRasterLayerMapConfiguration>
     {
-        public MapboxRasterLayerMapConfigurationEditor(IIOHelper ioHelper, IEditorConfigurationParser editorConfigurationParser) : base(ioHelper, editorConfigurationParser)
+        public MapboxRasterLayerMapConfigurationEditor(IIOHelper ioHelper) : base(ioHelper)
         {
         }
     }

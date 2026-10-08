@@ -2,6 +2,7 @@
 using System.IO;
 using System.Runtime.Serialization;
 using System.Text.Encodings.Web;
+using System.Text.Json.Serialization;
 using Ukad.UmbracoPackageMapbox.Core.Configs;
 
 namespace Ukad.UmbracoPackageMapbox.Core.Models
@@ -18,6 +19,7 @@ namespace Ukad.UmbracoPackageMapbox.Core.Models
         [DataMember(Name = "boundingBox", IsRequired = true)]
         public BoundingBoxModel BoundingBox { get; set; }
 
+        [JsonIgnore]
         public MapboxMarkerMapConfiguration Configuration { get; set; }
 
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)
