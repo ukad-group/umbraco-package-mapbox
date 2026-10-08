@@ -1,6 +1,6 @@
-﻿using Microsoft.AspNetCore.Html;
+﻿using System.Text.Json;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Newtonsoft.Json;
 using Ukad.UmbracoPackageMapbox.Core.Models;
 
 // ReSharper disable once CheckNamespace
@@ -8,14 +8,17 @@ namespace Ukad.UmbracoPackageMapbox.Core.Extensions
 {
     public static class MapboxExtensions
     {
+        // Same property names as the Newtonsoft.Json DataContract output used before Umbraco 17.
+        private static readonly JsonSerializerOptions SerializerOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+
         public static IHtmlContent RenderMarkerMap(this MapboxMarkerMapModel model)
         {
-            return new HtmlString(@$"<div data-mapboxmarkermap='{JsonConvert.SerializeObject(model)}' data-mapboxmarkermapdefaultconfig='{JsonConvert.SerializeObject(model.Configuration)}' style='width: 100%; height: 400px;'></div>");
+            return new HtmlString(@$"<div data-mapboxmarkermap='{JsonSerializer.Serialize(model, SerializerOptions)}' data-mapboxmarkermapdefaultconfig='{JsonSerializer.Serialize(model.Configuration, SerializerOptions)}' style='width: 100%; height: 400px;'></div>");
         }
 
         public static IHtmlContent RenderRasterLayerMap(this MapboxRasterLayerMapModel model)
         {
-            return new HtmlString(@$"<div data-mapboxrasterlayermap='{JsonConvert.SerializeObject(model)}' data-mapboxrasterlayermapdefaultconfig='{JsonConvert.SerializeObject(model.Configuration)}' style='width: 100%; height: 400px;'></div>");
+            return new HtmlString(@$"<div data-mapboxrasterlayermap='{JsonSerializer.Serialize(model, SerializerOptions)}' data-mapboxrasterlayermapdefaultconfig='{JsonSerializer.Serialize(model.Configuration, SerializerOptions)}' style='width: 100%; height: 400px;'></div>");
         }
 
         public static IHtmlContent MapboxScripts(this IHtmlHelper htmlHelper)

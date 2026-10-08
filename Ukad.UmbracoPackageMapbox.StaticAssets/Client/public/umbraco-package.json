@@ -1,0 +1,14 @@
+{
+  "$schema": "../node_modules/@umbraco-cms/backoffice/umbraco-package-schema.json",
+  "id": "Ukad.UmbracoPackageMapbox",
+  "name": "Ukad.UmbracoPackageMapbox",
+  "allowPackageTelemetry": true,
+  "extensions": [
+    {
+      "type": "bundle",
+      "alias": "Ukad.UmbracoPackageMapbox.Bundle",
+      "name": "Ukad Mapbox bundle",
+      "js": "/App_Plugins/Ukad.UmbracoPackageMapbox/ukad-mapbox.js"
+    }
+  ]
+}

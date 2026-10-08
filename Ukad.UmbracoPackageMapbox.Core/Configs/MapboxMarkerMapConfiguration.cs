@@ -11,31 +11,31 @@ namespace Ukad.UmbracoPackageMapbox.Core.Configs
         public string AccessToken { get; set; }
 
         [DataMember(Name = "defaultPosition")]
-        [ConfigurationField("defaultPosition", "Default Position", Constants.MarkerMapEditorView)]
+        [ConfigurationField("defaultPosition")]
         public MapboxMarkerMapModel DefaultPosition { get; set; }
 
         [DataMember(Name = "showSearch")]
-        [ConfigurationField("showSearch", "Show Search", Constants.BooleanView, Description = "Show search field above map.")]
+        [ConfigurationField("showSearch")]
         public bool ShowSearch { get; set; } = false;
 
         [DataMember(Name = "showSetMarkerByCoordinates")]
-        [ConfigurationField("showSetMarkerByCoordinates", "Show Set Marker By Coordinates", Constants.BooleanView, Description = "Set Marker By Coordinates field's above map.")]
+        [ConfigurationField("showSetMarkerByCoordinates")]
         public bool ShowSetMarkerByCoordinates { get; set; } = false;
 
         [DataMember(Name = "allowClear")]
-        [ConfigurationField("allowClear", "Allow Clear", Constants.BooleanView, Description = "Allow clearing previous marker.")]
+        [ConfigurationField("allowClear")]
         public bool AllowClear { get; set; } = true;
 
         [DataMember(Name = "scrollWheelZoom")]
-        [ConfigurationField("scrollWheelZoom", "Scroll wheel zoom", Constants.BooleanView, Description = "Enable scroll wheel zoom in property editor?")]
+        [ConfigurationField("scrollWheelZoom")]
         public bool ScrollWheelZoom { get; set; } = true;
 
         [DataMember(Name = "showZoom")]
-        [ConfigurationField("showZoom", "Show Zoom", Constants.BooleanView, Description = "Show zoom level above map.")]
+        [ConfigurationField("showZoom")]
         public bool ShowZoom { get; set; } = false;
 
         [DataMember(Name = "roundZoomToNatural")]
-        [ConfigurationField("roundZoomToNatural", "Round Zoom", Constants.BooleanView, Description = "Round Zoom to natural numbers.")]
+        [ConfigurationField("roundZoomToNatural")]
         public bool RoundZoomToNatural { get; set; } = true;
     }
 }

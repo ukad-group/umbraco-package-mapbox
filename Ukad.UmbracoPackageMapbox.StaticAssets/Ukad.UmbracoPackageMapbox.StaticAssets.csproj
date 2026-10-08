@@ -1,11 +1,35 @@
 <Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
-        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+        <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
         <StaticWebAssetBasePath>/</StaticWebAssetBasePath>
+        <ClientOutputDir>wwwroot\App_Plugins\Ukad.UmbracoPackageMapbox</ClientOutputDir>
     </PropertyGroup>
+
+    <!-- The backoffice UI is a Vite + TypeScript project in Client/, built into wwwroot/App_Plugins/Ukad.UmbracoPackageMapbox. -->
+    <ItemGroup>
+        <Content Remove="Client\**" />
+        <None Remove="Client\**" />
+        <!-- Added by IncludeClientOutput after the client build, so files from an earlier build are never picked up. -->
+        <Content Remove="$(ClientOutputDir)\**" />
+        <ClientInputs Include="Client\src\**;Client\public\**;Client\package.json;Client\package-lock.json;Client\vite.config.ts;Client\tsconfig.json" />
+    </ItemGroup>
+
+    <Target Name="RestoreClient" Inputs="Client\package.json;Client\package-lock.json" Outputs="Client\node_modules\.package-lock.json">
+        <Exec Command="npm ci --no-fund --no-audit" WorkingDirectory="Client" />
+    </Target>
+
+    <Target Name="BuildClient" DependsOnTargets="RestoreClient" BeforeTargets="ResolveProjectStaticWebAssets;AssignTargetPaths" Inputs="@(ClientInputs)" Outputs="$(ClientOutputDir)\ukad-mapbox.js">
+        <Exec Command="npm run build" WorkingDirectory="Client" />
+    </Target>
+
+    <Target Name="IncludeClientOutput" AfterTargets="BuildClient" BeforeTargets="ResolveProjectStaticWebAssets;AssignTargetPaths">
+        <ItemGroup>
+            <Content Include="$(ClientOutputDir)\**" />
+        </ItemGroup>
+    </Target>
 
 </Project>

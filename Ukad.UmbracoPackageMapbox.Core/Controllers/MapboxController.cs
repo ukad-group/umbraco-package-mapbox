@@ -1,12 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Umbraco.Cms.Web.Common.Controllers;
-using Umbraco.Cms.Web.Common.Attributes;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Mvc;
 using Ukad.UmbracoPackageMapbox.Core.Configs;
+using Umbraco.Cms.Api.Management.Controllers;
+using Umbraco.Cms.Api.Management.Routing;
 
 namespace Ukad.UmbracoPackageMapbox.Core.Controllers
 {
-    [PluginController(Constants.PluginName)]
-    public class MapboxController : UmbracoApiController
+    [ApiVersion("1.0")]
+    [VersionedApiBackOfficeRoute("mapbox")]
+    [ApiExplorerSettings(GroupName = Constants.PluginName)]
+    public class MapboxController : ManagementApiControllerBase
     {
         private readonly MapboxConfig _mapboxConfig;
 
@@ -15,7 +18,7 @@ namespace Ukad.UmbracoPackageMapbox.Core.Controllers
             _mapboxConfig = mapboxConfig;
         }
 
-        [HttpGet]
+        [HttpGet("settings")]
         public MapboxConfig GetSettings()
         {
             return _mapboxConfig;

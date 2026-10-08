@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Runtime.Serialization;
 using System.Text.Encodings.Web;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Html;
 using Ukad.UmbracoPackageMapbox.Core.Configs;
 
@@ -31,8 +32,9 @@ namespace Ukad.UmbracoPackageMapbox.Core.Models
         public string Image { get; set; }
 
         [DataMember(Name = "opacity", IsRequired = true)]
-        public double Opacity { get; set; }
+        public double Opacity { get; set; } = 100;
 
+        [JsonIgnore]
         public MapboxRasterLayerMapConfiguration Configuration { get; set; }
 
         public void WriteTo(TextWriter writer, HtmlEncoder encoder)

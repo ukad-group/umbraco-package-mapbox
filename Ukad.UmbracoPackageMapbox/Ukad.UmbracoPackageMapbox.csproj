@@ -2,7 +2,7 @@
     <PropertyGroup>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <Description>Umbraco extension containing a Map property editor using Mapbox</Description>
-        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+        <TargetFramework>net10.0</TargetFramework>
         <Title>Ukad.UmbracoPackageMapbox</Title>
         <PackageIcon>icon-128.png</PackageIcon>
         <ContentTargetFolders>.</ContentTargetFolders>

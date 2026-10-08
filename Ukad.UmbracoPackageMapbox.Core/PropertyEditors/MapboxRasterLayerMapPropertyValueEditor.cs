@@ -1,7 +1,6 @@
 ﻿using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 
 namespace Ukad.UmbracoPackageMapbox.Core.PropertyEditors
@@ -10,14 +9,14 @@ namespace Ukad.UmbracoPackageMapbox.Core.PropertyEditors
     {
         private readonly IJsonSerializer _jsonSerializer;
 
-        public MapboxRasterLayerMapPropertyValueEditor(ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, IJsonSerializer jsonSerializer)
-            : base(localizedTextService, shortStringHelper, jsonSerializer)
+        public MapboxRasterLayerMapPropertyValueEditor(IShortStringHelper shortStringHelper, IJsonSerializer jsonSerializer)
+            : base(shortStringHelper, jsonSerializer)
         {
             _jsonSerializer = jsonSerializer;
         }
 
-        public MapboxRasterLayerMapPropertyValueEditor(ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, IJsonSerializer jsonSerializer, IIOHelper ioHelper, DataEditorAttribute attribute)
-            : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
+        public MapboxRasterLayerMapPropertyValueEditor(IShortStringHelper shortStringHelper, IJsonSerializer jsonSerializer, IIOHelper ioHelper, DataEditorAttribute attribute)
+            : base(shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _jsonSerializer = jsonSerializer;
         }

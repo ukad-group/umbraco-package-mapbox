@@ -1,0 +1,58 @@
+@using System.Globalization
+@using Umbraco.Cms.Core.Models.Blocks
+@using Umbraco.Cms.Core.Models.PublishedContent
+@using Ukad.UmbracoPackageMapbox.Core.Models
+@using Ukad.UmbracoPackageMapbox.Core.Extensions
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+@{
+    Layout = null;
+    string Inv(FormattableString s) => s.ToString(CultureInfo.InvariantCulture);
+    string Ll(LatitudeLongitudeModel p) => p == null ? "null" : Inv($"{p.Latitude},{p.Longitude}");
+    string Bb(BoundingBoxModel b) => b == null ? "null" : Ll(b.SouthWestCorner) + "|" + Ll(b.NorthEastCorner);
+    string DumpMarker(MapboxMarkerMapModel m) => m == null ? "null" : Inv($"zoom={m.Zoom} marker={Ll(m.Marker)} bbox={Bb(m.BoundingBox)}");
+    string DumpRaster(MapboxRasterLayerMapModel r) => r == null ? "null" : Inv($"zoom={r.Zoom} image={r.Image} opacity={r.Opacity} tl={Ll(r.TopLeftPoint)} tr={Ll(r.TopRightPoint)} bl={Ll(r.BottomLeftPoint)} br={Ll(r.BottomRightPoint)} bbox={Bb(r.BoundingBox)}");
+}
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8" /><title>@Model.Name</title></head>
+<body>
+<h1>@Model.Name</h1>
+@foreach (var alias in new[] { "marker", "markerDefaults", "markerRequired" })
+{
+    <h2>@alias</h2>
+    MapboxMarkerMapModel m = null; string err = null;
+    try { m = Model.Value<MapboxMarkerMapModel>(alias); } catch (Exception e) { err = e.GetType().Name + ": " + e.Message; }
+    if (err != null) { <p class="dump" data-alias="@alias">ERROR @err</p> }
+    else { <p class="dump" data-alias="@alias">@DumpMarker(m)</p> if (m != null) { @m.RenderMarkerMap() } }
+}
+@foreach (var alias in new[] { "raster", "rasterFull" })
+{
+    <h2>@alias</h2>
+    MapboxRasterLayerMapModel r = null; string err = null;
+    try { r = Model.Value<MapboxRasterLayerMapModel>(alias); } catch (Exception e) { err = e.GetType().Name + ": " + e.Message; }
+    if (err != null) { <p class="dump" data-alias="@alias">ERROR @err</p> }
+    else { <p class="dump" data-alias="@alias">@DumpRaster(r)</p> if (r != null) { @r.RenderRasterLayerMap() } }
+}
+<h2>blocks</h2>
+@{
+    IEnumerable<IPublishedElement> blockItems = Enumerable.Empty<IPublishedElement>();
+    try { blockItems = (Model.Value<BlockListModel>("blocks") ?? new BlockListModel(new List<BlockListItem>())).Select(x => x.Content); } catch (Exception e) { <p class="dump" data-alias="blocks">ERROR @e.Message</p> }
+    try { blockItems = blockItems.Concat((Model.Value<BlockGridModel>("grid") ?? BlockGridModel.Empty).Select(x => x.Content)); } catch (Exception e) { <p class="dump" data-alias="grid">ERROR @e.Message</p> }
+}
+@foreach (var element in blockItems)
+{
+    var key = element.Key;
+    MapboxMarkerMapModel bm = null; MapboxRasterLayerMapModel br = null; string err = null;
+    try { bm = element.Value<MapboxMarkerMapModel>("blockMarker"); br = element.Value<MapboxRasterLayerMapModel>("blockRaster"); } catch (Exception e) { err = e.GetType().Name + ": " + e.Message; }
+    if (err != null) { <p class="dump" data-alias="block-@key">ERROR @err</p> }
+    else
+    {
+        <p class="dump" data-alias="block-@key-marker">@DumpMarker(bm)</p>
+        <p class="dump" data-alias="block-@key-raster">@DumpRaster(br)</p>
+        if (bm != null) { @bm.RenderMarkerMap() }
+        if (br != null) { @br.RenderRasterLayerMap() }
+    }
+}
+@Html.MapboxScripts()
+</body>
+</html>

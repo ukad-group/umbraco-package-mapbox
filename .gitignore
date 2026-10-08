@@ -46,5 +46,10 @@ bld/
 /Ukad.UmbracoPackageMapbox.Testsite/umbraco/config/
 /Ukad.UmbracoPackageMapbox.Testsite/Smidge/
 /Ukad.UmbracoPackageMapbox.Testsite.V1*/appsettings-schema*.json
+/Ukad.UmbracoPackageMapbox.Testsite.V1*/umbraco-package-schema.json
 /Ukad.UmbracoPackageMapbox.Testsite.V1*/umbraco/
 
+
+# Backoffice client (built by Ukad.UmbracoPackageMapbox.StaticAssets.csproj)
+Ukad.UmbracoPackageMapbox.StaticAssets/Client/node_modules/
+Ukad.UmbracoPackageMapbox.StaticAssets/wwwroot/App_Plugins/Ukad.UmbracoPackageMapbox/

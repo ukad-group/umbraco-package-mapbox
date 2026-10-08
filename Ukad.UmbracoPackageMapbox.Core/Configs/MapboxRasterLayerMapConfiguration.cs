@@ -11,31 +11,31 @@ namespace Ukad.UmbracoPackageMapbox.Core.Configs
         public string AccessToken { get; set; }
 
         [DataMember(Name = "defaultImage")]
-        [ConfigurationField("defaultImage", "Default Image", "imagepicker")]
+        [ConfigurationField("defaultImage")]
         public string DefaultImage { get; set; }
 
         [DataMember(Name = "showSetLayerByCoordinates")]
-        [ConfigurationField("showSetLayerByCoordinates", "Show Set Layer By Coordinates", Constants.BooleanView, Description = "Set Layer By Coordinates field's above map.")]
+        [ConfigurationField("showSetLayerByCoordinates")]
         public bool ShowSetLayerByCoordinates { get; set; } = false;
 
         [DataMember(Name = "allowClear")]
-        [ConfigurationField("allowClear", "Allow Clear", Constants.BooleanView, Description = "Allow clearing previous layer.")]
+        [ConfigurationField("allowClear")]
         public bool AllowClear { get; set; } = true;
 
         [DataMember(Name = "scrollWheelZoom")]
-        [ConfigurationField("scrollWheelZoom", "Scroll wheel zoom", Constants.BooleanView, Description = "Enable scroll wheel zoom in property editor?")]
+        [ConfigurationField("scrollWheelZoom")]
         public bool ScrollWheelZoom { get; set; } = true;
 
         [DataMember(Name = "showZoom")]
-        [ConfigurationField("showZoom", "Show Zoom", Constants.BooleanView, Description = "Show zoom level above map.")]
+        [ConfigurationField("showZoom")]
         public bool ShowZoom { get; set; } = false;
 
         [DataMember(Name = "roundZoomToNatural")]
-        [ConfigurationField("roundZoomToNatural", "Round Zoom", Constants.BooleanView, Description = "Round Zoom to natural numbers.")]
+        [ConfigurationField("roundZoomToNatural")]
         public bool RoundZoomToNatural { get; set; } = true;
 
         [DataMember(Name = "showOpacity")]
-        [ConfigurationField("showOpacity", "Show Image Opacity", Constants.BooleanView, Description = "Show Image Opacity.")]
+        [ConfigurationField("showOpacity")]
         public bool ShowOpacity { get; set; } = true;
     }
 }
