@@ -7,14 +7,14 @@ Allows to create new datatypes of types "Mapbox Marker Map" and "Mapbox Raster L
 
 | Package version | Umbraco version |
 | --------------- | --------------- |
-| 0.1.21 and later | 17 |
+| 0.1.21 and later | 17.7.1 and later 17.x |
 | up to 0.1.20 | 10 – 13 |
 
 ## Upgrading from Umbraco 13
 
 Existing data types, content and data type settings keep working without any data migration:
 
-1. Upgrade your site to Umbraco 17 as described in the [Umbraco upgrade documentation](https://docs.umbraco.com/umbraco-cms/fundamentals/setup/upgrading). Start from the latest Umbraco 13 release.
+1. Upgrade your site to Umbraco 17.7.1 or later as described in the [Umbraco upgrade documentation](https://docs.umbraco.com/umbraco-cms/fundamentals/setup/upgrading). Start from the latest Umbraco 13 release.
 2. Update `Ukad.UmbracoPackageMapbox` to 0.1.21 or later. You can do this before or after running the Umbraco upgrade.
 3. Keep the `MapboxConfig:AccessToken` setting as it is.
 
