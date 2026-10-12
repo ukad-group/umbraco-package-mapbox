@@ -17,17 +17,25 @@ jobs:
       version: ${{ steps.version.outputs.tag }}
     steps:
       - uses: "actions/checkout@v3"
+        with:
+          fetch-depth: 0
       - name: Sets pre-release tag
         run: |
           echo "PRE_RELEASE_TAG=development" >> $GITHUB_ENV
         if: ${{ github.ref == 'refs/heads/development' }}
-      - uses: 1k-off/action-semver-tag-release@1.0.3
+      # Replaces 1k-off/action-semver-tag-release, whose repository no longer exists:
+      # bumps the patch of the latest version tag and pushes the new tag.
+      - name: Create version tag
         id: version
-        with:
-          version: latest
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          pre_release_tag: ${{ env.PRE_RELEASE_TAG }}
-          
+        run: |
+          latest=$(git tag --list '[0-9]*.[0-9]*.[0-9]*' --sort=-v:refname | head -n 1)
+          IFS=. read -r major minor patch <<< "${latest%%-*}"
+          version="${major:-0}.${minor:-0}.$(( ${patch:-0} + 1 ))"
+          if [ -n "$PRE_RELEASE_TAG" ]; then version="$version-$PRE_RELEASE_TAG"; fi
+          git tag "$version"
+          git push origin "$version"
+          echo "tag=$version" >> "$GITHUB_OUTPUT"
+
   build-and-push-mapbox-core:
     runs-on: ubuntu-latest
     needs: [init]
